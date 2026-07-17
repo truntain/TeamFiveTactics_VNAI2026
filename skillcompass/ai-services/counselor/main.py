@@ -36,22 +36,39 @@ async def chat_endpoint(request: ChatRequest):
         # Convert evaluation framework to raw dict
         framework_dict = request.evaluation_framework.model_dump()
 
-        # 1. Gọi Evaluator Agent để đánh giá điểm số và trích xuất kỳ vọng trước
-        evaluation = await asyncio.to_thread(
-            evaluator_agent.evaluate_profile,
-            history, 
-            request.message, 
-            framework_dict
-        )
+        # Kiểm tra xem có phải lượt đầu tiên không (lịch sử hội thoại rỗng)
+        is_first_turn = len(history) == 0
         
-        # 2. Tạo chỉ thị định hướng hội thoại (steering directives) nếu thiếu thông tin vùng miền/mức lương
+        evaluation = None
         steering_directives = []
-        raw_expectations = evaluation.get("market_expectations", {})
-        preferred_locations = raw_expectations.get("preferred_locations", [])
-        expected_salary_min = raw_expectations.get("expected_salary_min", 0)
         
-        # Chỉ hỏi lồng ghép từ lượt chat thứ 2 trở đi để lượt đầu luôn mở đầu thân thiện trước
-        if len(history) >= 2:
+        if is_first_turn:
+            # Lượt 1: Bỏ qua Evaluator để tối ưu tốc độ phản hồi (giảm 50% latency)
+            evaluation = {
+                "context_inferred": "highschool",
+                "trait_scores": {k: 5 for k in framework_dict.get("traits_to_evaluate", {}).keys()},
+                "confidence_scores": {k: 0.0 for k in framework_dict.get("traits_to_evaluate", {}).keys()},
+                "market_expectations": {
+                    "preferred_locations": [],
+                    "expected_salary_min": 0,
+                    "willing_to_relocate": False
+                },
+                "is_ready": False
+            }
+        else:
+            # Lượt 2 trở đi: Gọi Evaluator Agent tuần tự trước để đánh giá
+            evaluation = await asyncio.to_thread(
+                evaluator_agent.evaluate_profile,
+                history, 
+                request.message, 
+                framework_dict
+            )
+            
+            raw_expectations = evaluation.get("market_expectations", {})
+            preferred_locations = raw_expectations.get("preferred_locations", [])
+            expected_salary_min = raw_expectations.get("expected_salary_min", 0)
+            
+            # Chỉ bẻ lái hội thoại từ lượt 2 trở đi để lượt đầu luôn chào hỏi tự nhiên
             if not preferred_locations:
                 steering_directives.append(
                     "Bạn học sinh chưa chia sẻ về địa điểm làm việc mong muốn. Hãy lồng ghép đặt 1 câu hỏi ngắn khéo léo xem bạn ấy sau này muốn làm việc ở gần nhà hay lên các thành phố lớn (Hà Nội, TP.HCM...)."
@@ -62,14 +79,14 @@ async def chat_endpoint(request: ChatRequest):
                     f"Bạn học sinh đã chọn khu vực {loc_name}. Thay vì hỏi trực tiếp mức lương kỳ vọng (vì học sinh chưa có kinh nghiệm), hãy đặt 1 câu hỏi dẫn dắt giới thiệu ngắn gọn về xu hướng nghề nghiệp đang phát triển mạnh hoặc các kỹ năng thực tế đang thiếu hụt tại {loc_name} (ví dụ: các mảng công nghệ/kỹ thuật thực hành...), và tìm hiểu xem bạn ấy có hứng thú học hỏi hoặc rèn luyện các kỹ năng thực tế đó không."
                 )
         
-        # 3. Gọi Counselor Agent sinh câu trả lời dựa trên lịch sử và chỉ thị
+        # Gọi Counselor Agent sinh câu trả lời (truyền kèm steering_directives nếu có)
         reply = await asyncio.to_thread(
             counselor_agent.generate_reply,
             history, 
             request.message, 
             request.target_field,
             framework_dict,
-            steering_directives
+            steering_directives if steering_directives else None
         )
         
         # Extract market expectations safely
