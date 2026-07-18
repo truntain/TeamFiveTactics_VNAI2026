@@ -14,6 +14,8 @@ Luồng:
         → Cập nhật vector_id vào PostgreSQL
 """
 import json
+import re
+import unicodedata
 import uuid
 from dataclasses import dataclass
 from typing import Optional
@@ -63,10 +65,21 @@ WHERE id = %s;
 
 def _map_track_type_to_field_id(track_type: str) -> str:
     """
-    Chuyển đổi track_type sang field_id chuẩn của hệ thống:
-    it, business, art, vocational, medical, general...
+    Chuyển đổi track_type sang field_id dạng ASCII slug cho Pinecone vector ID.
+    Pinecone chỉ chấp nhận ký tự ASCII trong vector ID.
+    VD: "Du lịch & Giải trí" -> "du_lich_giai_tri"
+    VD: "Cơ khí & Tự động hóa" -> "co_khi_tu_dong_hoa"
     """
-    return track_type.lower().strip() if track_type else "general"
+    if not track_type:
+        return "general"
+    # Chuẩn hóa Unicode và loại bỏ dấu tiếng Việt
+    t = unicodedata.normalize('NFKD', track_type)
+    t = t.encode('ascii', 'ignore').decode('ascii')
+    t = t.lower().strip()
+    # Thay tất cả ký tự không phải a-z0-9 bằng dấu gạch dưới
+    t = re.sub(r'[^a-z0-9]+', '_', t)
+    t = t.strip('_')
+    return t or "general"
 
 
 def fetch_unembedded_careers(conn, batch_size: int = 50) -> list[CareerTrackRow]:

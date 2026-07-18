@@ -62,12 +62,19 @@ def run(batch_size: int, dry_run: bool, skip_pinecone: bool):
 
     for i, career in enumerate(careers):
         print(f"[{i+1}/{total}] {career.career_track} (id={career.id})")
-        ok = process_career_from_sql(
-            conn=pg_conn,
-            pinecone_index=pinecone_index,
-            career=career,
-            dry_run=dry_run,
-        )
+        try:
+            ok = process_career_from_sql(
+                conn=pg_conn,
+                pinecone_index=pinecone_index,
+                career=career,
+                dry_run=dry_run,
+            )
+        except KeyboardInterrupt:
+            print("\n⛔ Người dùng dừng pipeline (Ctrl+C). Thoát...")
+            break
+        except Exception as e:
+            print(f"  💥 [EXCEPTION] Lỗi không xác định cho '{career.career_track}': {e}")
+            ok = False
         if ok:
             success += 1
         else:
