@@ -70,8 +70,13 @@ def run_evaluator_llm(
             temperature=0.1
         )
         
+        # Xóa markdown code block nếu LLM bọc ngoài
+        import re
+        cleaned = re.sub(r"^```(?:json)?\s*", "", response_text.strip())
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+        
         # Parse JSON output
-        parsed_data = json.loads(response_text)
+        parsed_data = json.loads(cleaned)
         
         # Ghi log thành công
         save_json_log("evaluator", session_id, {
