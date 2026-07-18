@@ -38,3 +38,9 @@ yarn-error.log*
 # NestJS
 /dist
 /coverage
+
+# Next.js
+.next/
+.env.local
+.env*.local
+
