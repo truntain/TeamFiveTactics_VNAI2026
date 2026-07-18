@@ -1,0 +1,132 @@
+{
+  "user_profile_summary": "Bạn sở hữu một bộ óc phân tích sắc bén (8/10) và khả năng giải quyết vấn đề phức tạp xuất sắc (8/10). Với tinh thần tự học mạnh mẽ (9/10) và tư duy phản biện (8/10), bạn có xu hướng làm việc độc lập, có trách nhiệm và tự chủ cao (8/10). Điểm yếu về giao tiếp (3/10) và làm việc nhóm (4/10) cho thấy bạn sẽ phát huy tối đa thế mạnh trong các môi trường đòi hỏi chuyên môn sâu, ít phụ thuộc vào tương tác xã hội liên tục. Đây là nền tảng vững chắc để bạn theo đuổi những ngành nghề kỹ thuật, công nghệ hoặc các lĩnh vực đòi hỏi tư duy logic và độ chính xác cao.",
+  "paths": [
+    {
+      "path_id": 1,
+      "track_type": "academic",
+      "career_track": "Backend Developer",
+      "match_score": 73,
+      "why_it_fits": "Ngành Backend Developer đòi hỏi tư duy logic, khả năng phân tích và giải quyết vấn đề phức tạp – đây chính là thế mạnh nổi bật của bạn (8/10). Công việc thường yêu cầu làm việc độc lập, tự học công nghệ mới (9/10) và chịu trách nhiệm về hệ thống (8/10). Điểm giao tiếp thấp không phải rào cản vì backend ít tương tác trực tiếp với khách hàng. Bạn sẽ thoải mái trong môi trường tập trung vào logic, cấu trúc dữ liệu và hiệu năng hệ thống.",
+      "market_warning": "",
+      "role_progression": [
+        {
+          "level": "Entry",
+          "title": "Junior Backend Developer",
+          "description": "Phát triển các API đơn giản, viết unit test, xử lý lỗi cơ bản dưới sự hướng dẫn của senior. Làm quen với quy trình phát triển phần mềm và hệ thống cơ sở dữ liệu."
+        },
+        {
+          "level": "Mid",
+          "title": "Backend Developer",
+          "description": "Thiết kế và phát triển các module phức tạp, tối ưu hiệu năng truy vấn, tham gia review code và đóng góp vào kiến trúc hệ thống. Có thể dẫn dắt một tính năng lớn."
+        },
+        {
+          "level": "Advanced",
+          "title": "Senior Backend Developer / Tech Lead",
+          "description": "Chịu trách nhiệm kiến trúc tổng thể hệ thống, đưa ra quyết định kỹ thuật, mentoring junior, và phối hợp với các bộ phận khác để đảm bảo hệ thống đáp ứng yêu cầu về tải và bảo mật."
+        }
+      ],
+      "skill_tree": {
+        "fundamentals": [
+          "Nguyên lý lập trình (OOP, Functional)",
+          "Cấu trúc dữ liệu & Giải thuật",
+          "Mạng máy tính cơ bản (HTTP, TCP/IP)"
+        ],
+        "core_technologies": [
+          "Ngôn ngữ lập trình backend (Python/Java/Node.js)",
+          "Cơ sở dữ liệu quan hệ (PostgreSQL, MySQL) và NoSQL (MongoDB, Redis)",
+          "Xây dựng RESTful API & GraphQL"
+        ],
+        "advanced_skills": [
+          "Kiến trúc microservices & containerization (Docker, Kubernetes)",
+          "Tối ưu hiệu năng hệ thống (caching, load balancing)",
+          "Bảo mật ứng dụng web (OWASP, authentication/authorization)"
+        ]
+      }
+    },
+    {
+      "path_id": 2,
+      "track_type": "academic",
+      "career_track": "Data Analyst",
+      "match_score": 72,
+      "why_it_fits": "Công việc Data Analyst xoay quanh việc phân tích dữ liệu, tìm ra xu hướng và giải quyết vấn đề kinh doanh – tận dụng tối đa điểm mạnh analytical_thinking (8/10) và complex_problem_solving (8/10). Bạn có khả năng tự học cao (9/10) để làm chủ các công cụ phân tích mới. Mặc dù cần giao tiếp để trình bày kết quả, nhưng phần lớn thời gian bạn sẽ làm việc độc lập với dữ liệu, phù hợp với điểm teamwork thấp (4/10).",
+      "market_warning": "Mức lương khởi điểm trung bình tại Hà Nội dao động từ 14,000,000 VND, bạn có thể cần tích lũy kinh nghiệm để đạt mức 15,000,000 VND mong muốn.",
+      "role_progression": [
+        {
+          "level": "Entry",
+          "title": "Junior Data Analyst",
+          "description": "Thu thập, làm sạch dữ liệu, viết báo cáo đơn giản bằng Excel/SQL, hỗ trợ senior trong các phân tích cơ bản. Học cách sử dụng các công cụ BI."
+        },
+        {
+          "level": "Mid",
+          "title": "Data Analyst",
+          "description": "Thực hiện các phân tích chuyên sâu, xây dựng dashboard, đưa ra insight cho phòng ban. Chủ động đề xuất cải tiến quy trình dựa trên dữ liệu."
+        },
+        {
+          "level": "Advanced",
+          "title": "Senior Data Analyst / Data Scientist",
+          "description": "Dẫn dắt các dự án phân tích lớn, xây dựng mô hình dự đoán, tham gia chiến lược dữ liệu của công ty, mentoring các analyst mới."
+        }
+      ],
+      "skill_tree": {
+        "fundamentals": [
+          "Thống kê mô tả & suy luận",
+          "Excel nâng cao (Pivot, Power Query)",
+          "SQL cơ bản (truy vấn, join, subquery)"
+        ],
+        "core_technologies": [
+          "Python (Pandas, NumPy, Matplotlib/Seaborn)",
+          "Công cụ trực quan hóa (Tableau, Power BI)",
+          "SQL nâng cao (window functions, optimization)"
+        ],
+        "advanced_skills": [
+          "Machine Learning cơ bản (hồi quy, phân loại, clustering)",
+          "Xử lý dữ liệu lớn (Spark, BigQuery)",
+          "Kể chuyện bằng dữ liệu (Data Storytelling) & thuyết trình"
+        ]
+      }
+    },
+    {
+      "path_id": 3,
+      "track_type": "vocational",
+      "career_track": "Kỹ Thuật Viên Sửa Chữa Ô Tô",
+      "match_score": 59,
+      "why_it_fits": "Dù điểm match không cao nhất, nhưng ngành này tận dụng tốt tư duy logic (8/10) và giải quyết vấn đề (8/10) khi chẩn đoán và sửa chữa các hệ thống phức tạp trên xe. Bạn có tính tự học (9/10) và trách nhiệm (8/10) – rất cần để theo kịp công nghệ ô tô hiện đại. Công việc mang tính độc lập cao, ít yêu cầu giao tiếp nhóm, phù hợp với điểm teamwork thấp (4/10). Đây là lựa chọn thực tế nếu bạn muốn đi theo con đường kỹ thuật ứng dụng ngay.",
+      "market_warning": "Mức lương khởi điểm trung bình tại Bình Dương dao động từ 9,000,000 VND, bạn có thể cần tích lũy kinh nghiệm để đạt mức 15,000,000 VND mong muốn. Ngành này tuyển dụng mạnh nhất tại Bình Dương. Vì bạn sẵn sàng di chuyển nơi làm việc, đây vẫn là một cơ hội tốt.",
+      "role_progression": [
+        {
+          "level": "Entry",
+          "title": "Thợ phụ sửa chữa ô tô",
+          "description": "Hỗ trợ thợ chính trong các công việc bảo dưỡng định kỳ, thay dầu, lốp, vệ sinh hệ thống. Làm quen với các thiết bị chẩn đoán cơ bản."
+        },
+        {
+          "level": "Mid",
+          "title": "Kỹ thuật viên sửa chữa chính",
+          "description": "Chẩn đoán và sửa chữa các hư hỏng phức tạp về động cơ, hộp số, hệ thống điện. Sử dụng thành thạo máy chẩn đoàn OBD và các công cụ chuyên dụng."
+        },
+        {
+          "level": "Advanced",
+          "title": "Trưởng ca / Chuyên gia chẩn đoán",
+          "description": "Quản lý nhóm kỹ thuật viên, xử lý các lỗi khó, đào tạo nhân viên mới, tư vấn kỹ thuật cho khách hàng. Có thể chuyên sâu về xe hybrid/điện."
+        }
+      ],
+      "skill_tree": {
+        "fundamentals": [
+          "Nguyên lý hoạt động động cơ đốt trong",
+          "Hệ thống điện cơ bản trên ô tô",
+          "An toàn lao động trong xưởng sửa chữa"
+        ],
+        "core_technologies": [
+          "Sử dụng máy chẩn đoán (OBD2, scan tool chuyên hãng)",
+          "Sửa chữa hệ thống phun xăng, đánh lửa, phanh ABS",
+          "Kỹ thuật hàn, tiện, sửa chữa cơ khí cơ bản"
+        ],
+        "advanced_skills": [
+          "Công nghệ xe hybrid và xe điện (HV battery, inverter)",
+          "Lập trình và cập nhật ECU",
+          "Quản lý xưởng dịch vụ và tư vấn kỹ thuật"
+        ]
+      }
+    }
+  ],
+  "disclaimer": "Lộ trình hướng nghiệp này được tổng hợp dựa trên dữ liệu thị trường lao động tại địa phương và đặc tính cá nhân của bạn. Đây là tài liệu tham khảo, bạn hoàn toàn có quyền tự quyết định con đường học tập của mình."
+}
