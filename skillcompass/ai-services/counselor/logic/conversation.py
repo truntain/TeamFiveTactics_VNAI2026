@@ -8,6 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 from prompts.counselor_prompt import COUNSELOR_SYSTEM_PROMPT
 from prompts.evaluator_prompt import EVALUATOR_SYSTEM_PROMPT
+from logic.pii_filter import anonymize_message, anonymize_history
 
 def run_evaluator_llm(
     conversation_history: List[Dict[str, str]], 
@@ -34,10 +35,10 @@ def run_evaluator_llm(
         default_core_scores_json=default_core_scores_json
     )
     
-    # 4. Chuẩn bị messages
-    messages = list(conversation_history)
+    # 4. Chuẩn bị messages — lọc PII trước khi gửi lên LLM bên thứ 3
+    messages = anonymize_history(list(conversation_history))
     if latest_message:
-        messages.append({"role": "user", "content": latest_message})
+        messages.append({"role": "user", "content": anonymize_message(latest_message)})
         
     # Default response structure in case of JSON parse failure
     fallback_response = {
@@ -100,10 +101,10 @@ def run_counselor_llm(
         counselor_instruction=counselor_instruction
     )
     
-    # 3. Chuẩn bị messages
-    messages = list(conversation_history)
+    # 3. Chuẩn bị messages — lọc PII trước khi gửi lên LLM bên thứ 3
+    messages = anonymize_history(list(conversation_history))
     if latest_message:
-        messages.append({"role": "user", "content": latest_message})
+        messages.append({"role": "user", "content": anonymize_message(latest_message)})
         
     try:
         response_text = config.call_llm(
