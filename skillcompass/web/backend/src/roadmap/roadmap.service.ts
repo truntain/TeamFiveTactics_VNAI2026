@@ -275,22 +275,25 @@ export class RoadmapService {
               growth,
             };
           })
-          .sort((a, b) => b.growth - a.growth)
-          .slice(0, 3)
-          .map((j) => j.name);
+          .sort((a, b) => b.growth - a.growth);
+
+        const previewJobs = sortedJobs.slice(0, 3).map((j) => j.name);
+        const allCategoryJobs = sortedJobs.map((j) => j.name);
 
         // If not enough jobs from DB, fallback with defaults
         const fallbackJobsMap: Record<string, string[]> = {
-          'Công nghệ thông tin': ['Trí tuệ Nhân tạo (AI)', 'Kỹ sư Dữ liệu', 'An toàn Thông tin'],
-          'Kinh doanh & Bán hàng': ['Digital Marketing', 'Phân tích Kinh doanh', 'Quản trị Sản phẩm'],
-          'Cơ khí & Tự động hóa': ['Kỹ sư Cơ khí', 'Kỹ thuật viên Phay CNC', 'Vận hành Robot'],
+          'Công nghệ thông tin': ['AI Lead', 'Kỹ sư phân tích dữ liệu (Analytics Engineer)', 'Chuyên viên An ninh mạng', 'Kỹ sư Dữ liệu', 'An toàn Thông tin'],
+          'Kinh doanh & Bán hàng': ['Chuyên viên Kinh doanh GPS', 'Chuyên viên Phát triển Kinh doanh Năng lượng Mặt trời', 'Nhân viên Phát triển Thị trường (Sàn TMĐT)', 'Digital Marketing', 'Phân tích Kinh doanh', 'Quản trị Sản phẩm'],
+          'Cơ khí & Tự động hóa': ['Nhân viên Điều phối Dự án', 'Kỹ sư thiết kế cơ khí', 'Kỹ thuật viên Cơ điện', 'Kỹ sư Cơ khí', 'Kỹ thuật viên Phay CNC', 'Vận hành Robot'],
         };
-        const finalJobs = sortedJobs.length >= 2 ? sortedJobs : fallbackJobsMap[cat.name];
+        const finalJobs = previewJobs.length >= 2 ? previewJobs : fallbackJobsMap[cat.name].slice(0, 3);
+        const finalAllJobs = allCategoryJobs.length >= 2 ? allCategoryJobs : fallbackJobsMap[cat.name];
 
         return {
           title: cat.displayName,
           gradient: cat.gradient,
           jobs: finalJobs,
+          allJobs: finalAllJobs,
         };
       });
 

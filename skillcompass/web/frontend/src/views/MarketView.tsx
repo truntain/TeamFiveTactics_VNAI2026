@@ -15,6 +15,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [jobDetail, setJobDetail] = useState<any>(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
+  const [selectedIndustry, setSelectedIndustry] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchTrends = async () => {
@@ -70,8 +71,19 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
               {topIndustries.map((ind, i) => (
                 <div key={i} style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '20px', overflow: 'hidden', transition: 'all .25s ease', flex: 1, boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}>
                   <div style={{ background: '#FFFFFF', borderRadius: '20px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    <div style={{ background: ind.gradient || 'linear-gradient(135deg, #0260FF 0%, #00C6FF 100%)', padding: '20px 24px' }}>
-                      <h3 style={{ fontWeight: 600, fontSize: '20px', lineHeight: '24px', margin: 0, color: '#FFFFFF' }}>{ind.title}</h3>
+                    <div
+                      onClick={() => setSelectedIndustry(ind)}
+                      style={{
+                        background: ind.gradient || 'linear-gradient(135deg, #0260FF 0%, #00C6FF 100%)',
+                        padding: '20px 24px', cursor: 'pointer', transition: 'opacity 0.2s'
+                      }}
+                      onMouseOver={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.opacity = '1'; }}
+                    >
+                      <h3 style={{ fontWeight: 600, fontSize: '20px', lineHeight: '24px', margin: 0, color: '#FFFFFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {ind.title}
+                        <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.2)', padding: '4px 8px', borderRadius: '10px', fontWeight: 500, letterSpacing: '0.5px' }}>Xem tất cả &rarr;</span>
+                      </h3>
                     </div>
                     <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
                       {ind.jobs && ind.jobs.map((job: string, idx: number) => (
@@ -367,15 +379,79 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
 
             </div>
           </div>
+        {/* Industry Jobs List Modal Popup */}
+        {selectedIndustry && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center',
+            zIndex: 9998, padding: '24px'
+          }}>
+            <div style={{
+              background: '#FFFFFF', borderRadius: '24px', width: '100%', maxWidth: '600px',
+              maxHeight: '80vh', overflowY: 'auto', padding: '40px', position: 'relative',
+              boxShadow: '0 24px 64px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)'
+            }}>
+              
+              {/* Close Button */}
+              <button 
+                onClick={() => setSelectedIndustry(null)}
+                style={{
+                  position: 'absolute', top: '24px', right: '24px', border: 'none',
+                  background: 'none', fontSize: '24px', cursor: 'pointer', color: '#5F6368',
+                  padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', transition: 'all 0.2s', width: '40px', height: '40px',
+                  backgroundColor: '#F3F4F6'
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#E5E7EB')}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#F3F4F6')}
+              >
+                &times;
+              </button>
+
+              <div style={{ fontFamily: '"Google Sans Flex", sans-serif' }}>
+                <h3 style={{ fontWeight: 600, fontSize: '24px', color: '#06040E', marginBottom: '8px' }}>
+                  Lĩnh vực: {selectedIndustry.title}
+                </h3>
+                <p style={{ fontSize: '15px', color: '#5F6368', marginBottom: '24px' }}>
+                  Chọn một ngành nghề để xem chi tiết cây kỹ năng và lộ trình thăng tiến:
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {selectedIndustry.allJobs && selectedIndustry.allJobs.map((job: string) => (
+                    <div
+                      key={job}
+                      onClick={() => {
+                        setSelectedIndustry(null);
+                        handleJobClick(job);
+                      }}
+                      style={{
+                        padding: '16px 20px', borderRadius: '14px', border: '1px solid #EEF2F7',
+                        background: '#F9FAFB', cursor: 'pointer', fontWeight: 500, fontSize: '16px',
+                        color: '#06040E', transition: 'all 0.2s', display: 'flex', justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = '#0260FF';
+                        e.currentTarget.style.background = '#FFFFFF';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(2,96,255,0.06)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = '#EEF2F7';
+                        e.currentTarget.style.background = '#F9FAFB';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <span>{job}</span>
+                      <span style={{ color: '#0260FF', fontSize: '20px' }}>&rarr;</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
         )}
-
-      </div>
-    </div>
-  );
-}
-
-export default MarketView;utton>
-        </section>
 
       </div>
     </div>
