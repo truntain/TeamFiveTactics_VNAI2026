@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import PORT
 from schemas.api_models import ChatRequest, ChatResponse, ProfileState, MarketExpectations
 from logic import conversation, state_manager
+from logic.logger_helper import save_json_log
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -74,7 +75,8 @@ async def chat_endpoint(request: ChatRequest):
                 conversation.run_evaluator_llm,
                 history,
                 request.message,
-                framework_dict
+                framework_dict,
+                request.session_id
             )
             
             # Cập nhật State theo thuật toán EMA & Stopping Criteria
@@ -107,7 +109,8 @@ async def chat_endpoint(request: ChatRequest):
             request.message,
             request.target_field,
             framework_dict,
-            counselor_instruction
+            counselor_instruction,
+            request.session_id
         )
         
         # Build ProfileState object to return
@@ -127,11 +130,19 @@ async def chat_endpoint(request: ChatRequest):
             is_ready=current_state_dict.get("is_ready", False)
         )
         
-        return ChatResponse(
+        chat_response_obj = ChatResponse(
             replies=replies_list,
             profile_update=profile_state_obj,
             is_ready=profile_state_obj.is_ready
         )
+        
+        # Save request/response exchange log
+        save_json_log("api", request.session_id, {
+            "request": request.model_dump(),
+            "response": chat_response_obj.model_dump()
+        })
+        
+        return chat_response_obj
     except Exception as e:
         import traceback
         traceback.print_exc()

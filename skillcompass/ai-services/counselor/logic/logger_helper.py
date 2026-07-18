@@ -1,0 +1,35 @@
+import os
+import json
+from datetime import datetime
+from typing import Any
+
+def save_json_log(category: str, filename_prefix: str, data: Any):
+    """
+    Saves a JSON log file under the 'logs/<category>/' folder.
+    
+    Args:
+        category: Subfolder name (e.g. 'api', 'evaluator', 'counselor')
+        filename_prefix: Prefix for filename (e.g. session_id)
+        data: Dict or list to write to file
+    """
+    try:
+        # Base folder is counselor root directory
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        log_dir = os.path.join(base_dir, "logs", category)
+        os.makedirs(log_dir, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        # Sanitize filename prefix
+        safe_prefix = "".join(c for c in filename_prefix if c.isalnum() or c in ("-", "_")).rstrip()
+        if not safe_prefix:
+            safe_prefix = "unknown"
+            
+        filename = f"{safe_prefix}_{timestamp}.json"
+        filepath = os.path.join(log_dir, filename)
+        
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            
+        print(f"   [JSON LOG] Saved data exchange packet to: {filepath}")
+    except Exception as e:
+        print(f"   [JSON LOG ERROR] Could not save log file: {e}")

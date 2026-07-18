@@ -21,6 +21,7 @@ from typing import Optional
 from models.schemas import PineconeData, CoreCompetencies, DomainSkill
 from processors.llm_extractor import extract_competencies_from_jd
 from processors.pinecone_uploader import upsert_to_pinecone
+from processors.logger_helper import save_json_log
 
 
 @dataclass
@@ -141,6 +142,13 @@ Lộ trình đào tạo: {career.education_route}
     print(f"  🤖 [LLM] Đang phân tích: {career.career_track}...")
     llm_result = extract_competencies_from_jd(career.career_track, jd_text)
 
+    # Ghi log gói dữ liệu trao đổi với LLM
+    save_json_log("llm_calls", f"career_{career.id}", {
+        "career_track": career.career_track,
+        "input_jd_text": jd_text,
+        "llm_output": llm_result
+    })
+
     if not llm_result:
         print(f"  ❌ Không thể bóc tách JD cho: {career.career_track}")
         return False
@@ -188,6 +196,22 @@ Lộ trình đào tạo: {career.education_route}
         db_data_dict=db_data_dict,
         dry_run=dry_run,
     )
+
+    # Ghi log gói dữ liệu trao đổi với Pinecone & PostgreSQL
+    save_json_log("database_upserts", f"career_{career.id}", {
+        "db_record_id": career.id,
+        "vector_id": vector_id,
+        "postgres_payload": db_data_dict,
+        "pinecone_payload": {
+            "vector_id": vector_id,
+            "core_competencies": pinecone_data.core_competencies.model_dump(),
+            "domain_competencies": {
+                skill: data.model_dump()
+                for skill, data in pinecone_data.domain_competencies.items()
+            }
+        },
+        "status": "success" if pinecone_ok else "failed"
+    })
 
     if not pinecone_ok:
         return False

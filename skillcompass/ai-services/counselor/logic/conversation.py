@@ -9,11 +9,13 @@ import config
 from prompts.counselor_prompt import COUNSELOR_SYSTEM_PROMPT
 from prompts.evaluator_prompt import EVALUATOR_SYSTEM_PROMPT
 from logic.pii_filter import anonymize_message, anonymize_history
+from logic.logger_helper import save_json_log
 
 def run_evaluator_llm(
     conversation_history: List[Dict[str, str]], 
     latest_message: str,
-    evaluation_framework: Dict[str, Any]
+    evaluation_framework: Dict[str, Any],
+    session_id: str = "unknown"
 ) -> Dict[str, Any]:
     """
     Gọi LLM Evaluator (Agent 2B) để phân tích cuộc đối thoại hiện tại và trích xuất điểm số.
@@ -52,6 +54,13 @@ def run_evaluator_llm(
         "is_off_topic": False
     }
     
+    input_log = {
+        "system_instruction": system_instruction,
+        "messages": messages,
+        "response_json": True,
+        "temperature": 0.1
+    }
+    
     try:
         # Gọi LLM (yêu cầu response_json)
         response_text = config.call_llm(
@@ -63,9 +72,24 @@ def run_evaluator_llm(
         
         # Parse JSON output
         parsed_data = json.loads(response_text)
+        
+        # Ghi log thành công
+        save_json_log("evaluator", session_id, {
+            "input": input_log,
+            "output": {
+                "raw_response": response_text,
+                "parsed": parsed_data
+            }
+        })
         return parsed_data
     except Exception as e:
         print(f"Error calling or parsing Evaluator LLM: {e}")
+        # Ghi log thất bại kèm theo error message
+        save_json_log("evaluator", session_id, {
+            "input": input_log,
+            "error": str(e),
+            "fallback": fallback_response
+        })
         return fallback_response
 
 def run_counselor_llm(
@@ -73,7 +97,8 @@ def run_counselor_llm(
     latest_message: str,
     target_field: str,
     evaluation_framework: Dict[str, Any],
-    counselor_instruction: str
+    counselor_instruction: str,
+    session_id: str = "unknown"
 ) -> List[str]:
     """
     Gọi LLM Counselor (Agent 2A) để sinh câu trả lời tự nhiên dưới dạng mảng các dòng ngắn.
@@ -106,6 +131,12 @@ def run_counselor_llm(
     if latest_message:
         messages.append({"role": "user", "content": anonymize_message(latest_message)})
         
+    input_log = {
+        "system_instruction": system_instruction,
+        "messages": messages,
+        "temperature": 0.7
+    }
+
     try:
         response_text = config.call_llm(
             system_instruction=system_instruction,
@@ -136,7 +167,20 @@ def run_counselor_llm(
         if not replies_list:
             replies_list = ["Mình hiểu rồi. Bạn có thể chia sẻ thêm về trải nghiệm thực tế này không?"]
             
+        save_json_log("counselor", session_id, {
+            "input": input_log,
+            "output": {
+                "raw_response": response_text,
+                "parsed_replies": replies_list
+            }
+        })
         return replies_list
     except Exception as e:
         print(f"Error calling Counselor LLM: {e}")
-        return ["Rất tiếc, hệ thống gặp gián đoạn nhẹ. Mình cùng tiếp tục trò chuyện nhé."]
+        fallback = ["Rất tiếc, hệ thống gặp gián đoạn nhẹ. Mình cùng tiếp tục trò chuyện nhé."]
+        save_json_log("counselor", session_id, {
+            "input": input_log,
+            "error": str(e),
+            "fallback": fallback
+        })
+        return fallback
