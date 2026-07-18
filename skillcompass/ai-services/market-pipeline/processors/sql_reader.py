@@ -64,26 +64,26 @@ WHERE id = %s;
 def _map_track_type_to_field_id(track_type: str) -> str:
     """
     Chuyển đổi track_type sang field_id chuẩn của hệ thống:
-    f_it, f_business, f_art, f_vocational, f_medical
+    it, business, art, vocational, medical
     """
     if not track_type:
-        return "f_it"
+        return "it"
     t = track_type.lower().strip()
     if t == "business":
-        return "f_business"
+        return "business"
     elif t == "it":
-        return "f_it"
+        return "it"
     elif t == "vocational":
-        return "f_vocational"
+        return "vocational"
     elif t == "medical":
-        return "f_medical"
+        return "medical"
     elif t == "art":
-        return "f_art"
+        return "art"
     elif t == "academic":
-        return "f_it"
+        return "it"
     
-    # Fallback cho general hoặc các loại khác để thỏa mãn validator
-    return "f_vocational"
+    # Fallback cho general hoặc các loại khác
+    return "vocational"
 
 
 def fetch_unembedded_careers(conn, batch_size: int = 50) -> list[CareerTrackRow]:
