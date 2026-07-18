@@ -11,6 +11,11 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
   const [regionalTrends, setRegionalTrends] = useState<any>({ rising: [], falling: [] });
   const [isLoading, setIsLoading] = useState(true);
 
+  // States cho Popup Chi tiết Ngành học
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [jobDetail, setJobDetail] = useState<any>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+
   useEffect(() => {
     const fetchTrends = async () => {
       setIsLoading(true);
@@ -29,6 +34,23 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
     };
     fetchTrends();
   }, [region]);
+
+  const handleJobClick = async (jobName: string) => {
+    setSelectedJob(jobName);
+    setIsDetailLoading(true);
+    setJobDetail(null);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/career/detail?name=${encodeURIComponent(jobName)}`);
+      const data = await res.json();
+      if (data.success) {
+        setJobDetail(data);
+      }
+    } catch (err) {
+      console.error('Error fetching job detail:', err);
+    } finally {
+      setIsDetailLoading(false);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: '#FAFAFA', padding: '64px 48px', fontFamily: '"Google Sans Flex", sans-serif' }}>
@@ -53,7 +75,23 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                     </div>
                     <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
                       {ind.jobs && ind.jobs.map((job: string, idx: number) => (
-                        <div key={job} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#FFFFFF', padding: '14px 18px', borderRadius: '14px', border: '1px solid #EEF2F7', transition: 'all .2s ease' }}>
+                        <div
+                          key={job}
+                          onClick={() => handleJobClick(job)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '12px', background: '#FFFFFF',
+                            padding: '14px 18px', borderRadius: '14px', border: '1px solid #EEF2F7',
+                            transition: 'all .2s ease', cursor: 'pointer'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.borderColor = '#0260FF';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(2,96,255,0.08)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.borderColor = '#EEF2F7';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        >
                           <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: '20px', color: '#0260FF' }}>{idx + 1}</div>
                           <div style={{ fontWeight: 500, fontSize: '16px', lineHeight: '20px', color: '#06040E' }}>{job}</div>
                         </div>
@@ -99,7 +137,23 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                   </div>
                   <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
                     {regionalTrends.rising && regionalTrends.rising.map((j: any) => (
-                      <div key={j.n} style={{ padding: '14px 18px', borderRadius: '14px', border: '1px solid #EEF2F7', background: '#FFFFFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all .2s ease' }}>
+                      <div
+                        key={j.n}
+                        onClick={() => handleJobClick(j.n)}
+                        style={{
+                          padding: '14px 18px', borderRadius: '14px', border: '1px solid #EEF2F7',
+                          background: '#FFFFFF', display: 'flex', justifyContent: 'space-between',
+                          alignItems: 'center', transition: 'all .2s ease', cursor: 'pointer'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.borderColor = '#11998E';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(17,153,142,0.08)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.borderColor = '#EEF2F7';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
                         <span style={{ fontWeight: 400, fontSize: '16px', lineHeight: '20px', color: '#06040E' }}>{j.n}</span>
                         <span style={{ fontSize: '12px', lineHeight: '16px', fontWeight: 600, padding: '6px 10px', background: '#F3F4F6', color: '#6B7280', borderRadius: '999px', border: 'none', letterSpacing: 0 }}>{j.field}</span>
                       </div>
@@ -119,7 +173,23 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                   </div>
                   <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
                     {regionalTrends.falling && regionalTrends.falling.map((j: any) => (
-                      <div key={j.n} style={{ padding: '14px 18px', borderRadius: '14px', border: '1px solid #EEF2F7', background: '#FFFFFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all .2s ease' }}>
+                      <div
+                        key={j.n}
+                        onClick={() => handleJobClick(j.n)}
+                        style={{
+                          padding: '14px 18px', borderRadius: '14px', border: '1px solid #EEF2F7',
+                          background: '#FFFFFF', display: 'flex', justifyContent: 'space-between',
+                          alignItems: 'center', transition: 'all .2s ease', cursor: 'pointer'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.borderColor = '#D93025';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(217,48,37,0.08)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.borderColor = '#EEF2F7';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
                         <span style={{ fontWeight: 400, fontSize: '16px', lineHeight: '20px', color: '#06040E' }}>{j.n}</span>
                         <span style={{ fontSize: '12px', lineHeight: '16px', fontWeight: 600, padding: '6px 10px', background: '#F3F4F6', color: '#6B7280', borderRadius: '999px', border: 'none', letterSpacing: 0 }}>{j.field}</span>
                       </div>
@@ -145,6 +215,166 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
           }}>
             Tư vấn bằng AI ngay
           </button>
+        </section>
+
+        {/* Job Detail Modal Popup */}
+        {selectedJob && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center',
+            zIndex: 9999, padding: '24px'
+          }}>
+            <div style={{
+              background: '#FFFFFF', borderRadius: '24px', width: '100%', maxWidth: '750px',
+              maxHeight: '85vh', overflowY: 'auto', padding: '40px', position: 'relative',
+              boxShadow: '0 24px 64px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)'
+            }}>
+              
+              {/* Close Button */}
+              <button 
+                onClick={() => setSelectedJob(null)}
+                style={{
+                  position: 'absolute', top: '24px', right: '24px', border: 'none',
+                  background: 'none', fontSize: '24px', cursor: 'pointer', color: '#5F6368',
+                  padding: '8px', borderRadius: '50%', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', transition: 'all 0.2s', width: '40px', height: '40px',
+                  backgroundColor: '#F3F4F6'
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#E5E7EB')}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#F3F4F6')}
+              >
+                &times;
+              </button>
+
+              {isDetailLoading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', gap: '16px' }}>
+                  <Loader2 className="animate-spin" size={36} color="#0260FF" />
+                  <span style={{ fontSize: '16px', color: '#5F6368', fontWeight: 500 }}>Đang tải lộ trình và cây kỹ năng của {selectedJob}...</span>
+                </div>
+              ) : jobDetail ? (
+                <div style={{ fontFamily: '"Google Sans Flex", sans-serif' }}>
+                  <span style={{
+                    fontSize: '13px', fontWeight: 700, color: '#0260FF',
+                    textTransform: 'uppercase', letterSpacing: '1px', background: '#F0F4FF',
+                    padding: '6px 12px', borderRadius: '20px'
+                  }}>
+                    {jobDetail.track_type}
+                  </span>
+                  
+                  <h3 style={{ fontWeight: 600, fontSize: '28px', lineHeight: '34px', color: '#06040E', marginTop: '16px', marginBottom: '12px' }}>
+                    {jobDetail.career_track}
+                  </h3>
+
+                  <p style={{ fontSize: '15px', lineHeight: '24px', color: '#5F6368', marginBottom: '24px' }}>
+                    {jobDetail.description}
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '32px', padding: '16px 20px', background: '#F8F9FA', borderRadius: '16px' }}>
+                    <div>
+                      <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.5)', fontWeight: 500 }}>LƯƠNG TRUNG BÌNH THỊ TRƯỜNG</span>
+                      <div style={{ fontSize: '18px', fontWeight: 600, color: '#06040E', marginTop: '4px' }}>
+                        {jobDetail.avg_salary_min ? `${(jobDetail.avg_salary_min / 1000000).toFixed(0)}tr` : 'Thỏa thuận'} - {jobDetail.avg_salary_max ? `${(jobDetail.avg_salary_max / 1000000).toFixed(0)}tr` : 'Thỏa thuận'} VND/tháng
+                      </div>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.5)', fontWeight: 500 }}>LỘ TRÌNH ĐÀO TẠO ĐỀ XUẤT</span>
+                      <div style={{ fontSize: '15px', fontWeight: 500, color: '#06040E', marginTop: '4px', lineHeight: '20px' }}>
+                        {jobDetail.education_route || 'Đại học / Tự học & Đào tạo ngắn hạn'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Skill Tree */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <h4 style={{ fontWeight: 600, fontSize: '16px', color: '#06040E', marginBottom: '16px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '8px' }}>
+                      Cây Kỹ năng (Skill Tree)
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#4B5563', marginBottom: '8px', textTransform: 'uppercase' }}>Kỹ năng nền tảng:</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          {jobDetail.skill_tree.fundamentals && jobDetail.skill_tree.fundamentals.map((s: string) => (
+                            <span key={s} style={{ background: '#F3F4F6', color: '#4B5563', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', border: '1px solid #E5E7EB' }}>{s}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#0260FF', marginBottom: '8px', textTransform: 'uppercase' }}>Công nghệ cốt lõi:</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          {jobDetail.skill_tree.core_technologies && jobDetail.skill_tree.core_technologies.map((s: string) => (
+                            <span key={s} style={{ background: '#F0F4FF', color: '#0260FF', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', border: '1px solid rgba(2,96,255,0.1)' }}>{s}</span>
+                          ))}
+                        </div>
+                      </div>
+                      {jobDetail.skill_tree.advanced_skills && jobDetail.skill_tree.advanced_skills.length > 0 && (
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#059669', marginBottom: '8px', textTransform: 'uppercase' }}>Kỹ năng nâng cao:</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                            {jobDetail.skill_tree.advanced_skills.map((s: string) => (
+                              <span key={s} style={{ background: '#ECFDF5', color: '#059669', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', border: '1px solid rgba(5,150,105,0.1)' }}>{s}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Role Progression */}
+                  {jobDetail.role_progression && jobDetail.role_progression.length > 0 && (
+                    <div style={{ marginBottom: '16px' }}>
+                      <h4 style={{ fontWeight: 600, fontSize: '16px', color: '#06040E', marginBottom: '16px', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: '8px' }}>
+                        Lộ trình Thăng tiến vị trí (Career Path)
+                      </h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {jobDetail.role_progression.map((step: any, idx: number) => (
+                          <div key={idx} style={{ background: '#FAFBFD', padding: '16px', borderRadius: '14px', borderLeft: '4px solid #0260FF', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+                            <div style={{ fontWeight: 600, fontSize: '15px', color: '#06040E' }}>
+                              <span style={{ color: '#0260FF', marginRight: '8px' }}>[{step.level}]</span>
+                              {step.title}
+                            </div>
+                            <div style={{ fontSize: '13px', color: '#5F6368', marginTop: '6px', lineHeight: '20px' }}>
+                              {step.description}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Typical Employers */}
+                  {jobDetail.typical_employers && jobDetail.typical_employers.length > 0 && (
+                    <div style={{ marginTop: '24px' }}>
+                      <h4 style={{ fontWeight: 600, fontSize: '15px', color: '#06040E', marginBottom: '12px' }}>
+                        Doanh nghiệp tuyển dụng tiêu biểu:
+                      </h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                        {jobDetail.typical_employers.map((emp: string) => (
+                          <span key={emp} style={{ background: '#FFFBEB', color: '#D97706', padding: '6px 12px', borderRadius: '12px', fontSize: '13px', border: '1px solid rgba(217,119,6,0.1)', fontWeight: 500 }}>
+                            {emp}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '48px 0', color: '#D93025', fontWeight: 500 }}>
+                  Không thể lấy thông tin chi tiết. Vui lòng thử lại sau.
+                </div>
+              )}
+
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+export default MarketView;utton>
         </section>
 
       </div>

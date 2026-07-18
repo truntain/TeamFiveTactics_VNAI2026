@@ -343,5 +343,75 @@ export class RoadmapService {
       throw new HttpException('Lỗi khi lấy dữ liệu xu hướng thị trường.', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async getCareerDetail(name: string) {
+    try {
+      if (!name) {
+        throw new HttpException('Tên ngành không được để trống.', HttpStatus.BAD_REQUEST);
+      }
+      const career = await this.prisma.careerTrack.findFirst({
+        where: {
+          career_track: {
+            equals: name,
+            mode: 'insensitive',
+          },
+        },
+        include: {
+          role_progressions: {
+            orderBy: {
+              sort_order: 'asc',
+            },
+          },
+          skill_trees: true,
+        },
+      });
+
+      if (!career) {
+        throw new HttpException('Không tìm thấy thông tin ngành này.', HttpStatus.NOT_FOUND);
+      }
+
+      // Format skill trees into categories
+      const fundamentals: string[] = [];
+      const core_technologies: string[] = [];
+      const advanced_skills: string[] = [];
+
+      career.skill_trees.forEach((st) => {
+        if (st.category === 'fundamentals') {
+          fundamentals.push(st.skill_name);
+        } else if (st.category === 'core_technologies') {
+          core_technologies.push(st.skill_name);
+        } else if (st.category === 'advanced_skills') {
+          advanced_skills.push(st.skill_name);
+        }
+      });
+
+      return {
+        success: true,
+        career_track: career.career_track,
+        track_type: career.track_type,
+        description: career.description,
+        avg_salary_min: career.avg_salary_min,
+        avg_salary_max: career.avg_salary_max,
+        education_route: career.education_route,
+        typical_employers: career.typical_employers,
+        local_demand_signals: career.local_demand_signals,
+        role_progression: career.role_progressions.map((rp) => ({
+          level: rp.level,
+          title: rp.title,
+          description: rp.description,
+        })),
+        skill_tree: {
+          fundamentals,
+          core_technologies,
+          advanced_skills,
+        },
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      this.logger.error(`Error fetching career detail: ${error.message}`);
+      throw new HttpException('Lỗi khi lấy chi tiết ngành học.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
+
 

@@ -16,4 +16,9 @@ export class RoadmapController {
   async getTrends(@Query('region') region?: string) {
     return this.roadmapService.getTrends(region);
   }
+
+  @Get('detail')
+  async getDetail(@Query('name') name: string) {
+    return this.roadmapService.getCareerDetail(name);
+  }
 }
