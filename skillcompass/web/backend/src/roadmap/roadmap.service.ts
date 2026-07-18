@@ -211,4 +211,137 @@ export class RoadmapService {
       };
     }
   }
+
+  async getTrends(region?: string) {
+    try {
+      // 1. Map region name to DB key
+      let dbRegion = 'HCM'; // default fallback
+      if (region) {
+        const rNorm = region.toLowerCase();
+        if (rNorm.includes('hà nội') || rNorm.includes('hn')) {
+          dbRegion = 'HN';
+        } else if (rNorm.includes('hồ chí minh') || rNorm.includes('hcm') || rNorm.includes('sài gòn')) {
+          dbRegion = 'HCM';
+        } else if (rNorm.includes('đà nẵng') || rNorm.includes('dn')) {
+          dbRegion = 'HN'; // Fallback key
+        }
+      }
+
+      // 2. Fetch all career tracks
+      const careers = await this.prisma.careerTrack.findMany();
+
+      const parseGrowthRate = (val: any): number => {
+        if (!val) return 0;
+        if (typeof val === 'number') return val;
+        const str = String(val).replace(/%/g, '').trim();
+        const num = parseFloat(str);
+        return isNaN(num) ? 0 : num;
+      };
+
+      // 3. Process categories
+      const targetCategories = [
+        {
+          name: 'Công nghệ thông tin',
+          displayName: 'Công nghệ Thông tin',
+          gradient: 'linear-gradient(135deg, #0260FF 0%, #00C6FF 100%)',
+        },
+        {
+          name: 'Kinh doanh & Bán hàng',
+          displayName: 'Marketing & Kinh doanh',
+          gradient: 'linear-gradient(135deg, #FF9900 0%, #FF5E62 100%)',
+        },
+        {
+          name: 'Cơ khí & Tự động hóa',
+          displayName: 'Cơ khí & Tự động hóa',
+          gradient: 'linear-gradient(135deg, #7F00FF 0%, #E100FF 100%)',
+        },
+      ];
+
+      const topIndustries = targetCategories.map((cat) => {
+        const catCareers = careers.filter(
+          (c) =>
+            c.track_type.toLowerCase().includes(cat.name.toLowerCase()) ||
+            cat.name.toLowerCase().includes(c.track_type.toLowerCase()),
+        );
+
+        // Sort by growth rate of the selected region
+        const sortedJobs = catCareers
+          .map((c) => {
+            const signals = (c.local_demand_signals as any) || {};
+            const regionData = signals[dbRegion] || signals['HCM'] || signals['HN'] || {};
+            const growth = parseGrowthRate(regionData.growth_rate);
+            return {
+              name: c.career_track,
+              growth,
+            };
+          })
+          .sort((a, b) => b.growth - a.growth)
+          .slice(0, 3)
+          .map((j) => j.name);
+
+        // If not enough jobs from DB, fallback with defaults
+        const fallbackJobsMap: Record<string, string[]> = {
+          'Công nghệ thông tin': ['Trí tuệ Nhân tạo (AI)', 'Kỹ sư Dữ liệu', 'An toàn Thông tin'],
+          'Kinh doanh & Bán hàng': ['Digital Marketing', 'Phân tích Kinh doanh', 'Quản trị Sản phẩm'],
+          'Cơ khí & Tự động hóa': ['Kỹ sư Cơ khí', 'Kỹ thuật viên Phay CNC', 'Vận hành Robot'],
+        };
+        const finalJobs = sortedJobs.length >= 2 ? sortedJobs : fallbackJobsMap[cat.name];
+
+        return {
+          title: cat.displayName,
+          gradient: cat.gradient,
+          jobs: finalJobs,
+        };
+      });
+
+      // 4. Process Rising and Falling careers
+      const careersWithSignals = careers.map((c) => {
+        const signals = (c.local_demand_signals as any) || {};
+        const regionData = signals[dbRegion] || signals['HCM'] || signals['HN'] || {};
+        const growth = parseGrowthRate(regionData.growth_rate);
+        return {
+          name: c.career_track,
+          field: c.track_type,
+          growth,
+        };
+      });
+
+      const rising = [...careersWithSignals]
+        .sort((a, b) => b.growth - a.growth)
+        .slice(0, 4)
+        .map((c) => ({ n: c.name, field: c.field }));
+
+      const falling = [...careersWithSignals]
+        .filter(c => c.growth > 0)
+        .sort((a, b) => a.growth - b.growth)
+        .slice(0, 4)
+        .map((c) => ({ n: c.name, field: c.field }));
+
+      const defaultFalling = [
+        { n: 'Nhân viên Bưu chính', field: 'Vận tải & Logistics' },
+        { n: 'Kế toán sơ cấp', field: 'Tài chính' },
+        { n: 'Quản lý kho thủ công', field: 'Sản xuất' },
+        { n: 'Nhân viên giáo vụ', field: 'Giáo dục & Đào tạo' }
+      ];
+      const finalFalling = falling.length >= 2 ? falling : defaultFalling;
+
+      return {
+        success: true,
+        region: dbRegion,
+        topIndustries,
+        regionalTrends: {
+          rising: rising.length >= 2 ? rising : [
+            { n: 'Kỹ sư Phần mềm', field: 'Công nghệ Thông tin' },
+            { n: 'Chuyên viên SEO', field: 'Marketing' },
+            { n: 'Phân tích Dữ liệu', field: 'Dữ liệu & Kinh doanh' }
+          ],
+          falling: finalFalling,
+        },
+      };
+    } catch (error) {
+      this.logger.error(`Error fetching trends: ${error.message}`);
+      throw new HttpException('Lỗi khi lấy dữ liệu xu hướng thị trường.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
+
