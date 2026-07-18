@@ -103,8 +103,7 @@ Output mong đợi:
     "python_programming": {"weight_omega": 0.9, "required_level": 8},
     "rest_api_design": {"weight_omega": 0.85, "required_level": 7},
     "database_optimization": {"weight_omega": 0.8, "required_level": 7}
-  },
-  "evidence": "Thiết kế API và tối ưu DB → analytical+problem_solving cao; Làm việc độc lập → autonomy 8"
+  }
 }
 
 VÍ DỤ 2 - Nhân viên bán hàng:
@@ -121,8 +120,7 @@ Output mong đợi:
     "customer_communication": {"weight_omega": 0.95, "required_level": 9},
     "sales_technique": {"weight_omega": 0.9, "required_level": 7},
     "crm_management": {"weight_omega": 0.6, "required_level": 5}
-  },
-  "evidence": "Tư vấn khách hàng → communication 9; Đạt chỉ tiêu doanh số → adaptability+autonomy cao"
+  }
 }
 """
 
@@ -148,8 +146,7 @@ SYSTEM_PROMPT = f"""Bạn là một Chuyên gia Nhân sự (HR Expert) với 20 
   }},
   "domain_competencies": {{
     "<skill_snake_case>": {{ "weight_omega": <float 0-1>, "required_level": <int 1-10> }}
-  }},
-  "evidence": "<Trích dẫn câu cụ thể trong JD chứng minh điểm số trên>"
+  }}
 }}
 
 QUAN TRỌNG: Chỉ điền domain_competencies những kỹ năng THỰC SỰ được đề cập trong JD. Tối đa 6 kỹ năng.
@@ -178,33 +175,35 @@ Mô tả công việc:
 
 Hãy chấm điểm dựa trên RUBRIC đã cho. Nhớ bám vào thang điểm mẫu để nhất quán."""
 
-    try:
-        response = client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_message},
-            ],
-            temperature=0.1,
-            max_tokens=2048,
-        )
+    for attempt in range(3):
+        try:
+            response = client.chat.completions.create(
+                model=LLM_MODEL,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message},
+                ],
+                temperature=0.1 + (attempt * 0.1),
+                max_tokens=2048,
+            )
 
-        raw_content = response.choices[0].message.content.strip()
+            raw_content = response.choices[0].message.content.strip()
 
-        # Xóa markdown code block nếu LLM bọc ngoài
-        cleaned = re.sub(r"^```(?:json)?\s*", "", raw_content)
-        cleaned = re.sub(r"\s*```$", "", cleaned)
+            # Xóa markdown code block nếu LLM bọc ngoài
+            cleaned = re.sub(r"^```(?:json)?\s*", "", raw_content)
+            cleaned = re.sub(r"\s*```$", "", cleaned)
 
-        result = json.loads(cleaned)
-        return result
+            result = json.loads(cleaned)
+            return result
 
-    except json.JSONDecodeError as e:
-        print(f"  ⚠️  [LLM] JSON parse lỗi cho '{job_title}': {e}")
-        print(f"       Raw response: {raw_content[:300]}")
-        return None
-    except Exception as e:
-        print(f"  ❌ [LLM] Lỗi API cho '{job_title}': {e}")
-        return None
+        except json.JSONDecodeError as e:
+            print(f"  ⚠️  [LLM] JSON parse lỗi (Lần thử {attempt+1}/3) cho '{job_title}': {e}")
+            if attempt == 2:
+                print(f"       Raw response: {raw_content[:400]}")
+        except Exception as e:
+            print(f"  ❌ [LLM] Lỗi API (Lần thử {attempt+1}/3) cho '{job_title}': {e}")
+            
+    return None
 
 
 def test_llm_connection() -> bool:
