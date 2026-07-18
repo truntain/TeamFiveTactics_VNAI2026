@@ -8,7 +8,10 @@ import axios from 'axios';
 export class RoadmapService {
   private readonly logger = new Logger(RoadmapService.name);
   private readonly prisma: PrismaClient;
-  private readonly roadmapUrl = process.env.ROADMAP_SERVICE_URL || 'http://localhost:8003/generate-roadmap';
+  private getRoadmapUrl(): string {
+    const raw = process.env.ROADMAP_SERVICE_URL || 'http://localhost:8003/generate-roadmap';
+    return raw.endsWith('/generate-roadmap') ? raw : `${raw.replace(/\/+$/, '')}/generate-roadmap`;
+  }
 
   constructor() {
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -25,9 +28,10 @@ export class RoadmapService {
       sessionId = input.session_id || input.sessionId || (input.user_profile && typeof input.user_profile === 'object' ? input.user_profile.session_id : '') || (typeof input.user_profile === 'string' ? input.user_profile : '');
     }
 
-    if (!sessionId) {
-      this.logger.error('Session ID is missing in roadmap request.');
-      throw new HttpException('Session ID là bắt buộc.', HttpStatus.BAD_REQUEST);
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!sessionId || !uuidRegex.test(sessionId)) {
+      this.logger.error(`Invalid session ID format: ${sessionId}`);
+      throw new HttpException('Session ID phải đúng định dạng UUID v4.', HttpStatus.BAD_REQUEST);
     }
 
     this.logger.log(`Generating roadmap for session: ${sessionId}`);
@@ -99,8 +103,9 @@ export class RoadmapService {
 
     // 4. Gọi Python Roadmap Microservice
     try {
-      this.logger.log(`Calling Python Roadmap API at ${this.roadmapUrl}...`);
-      const response = await axios.post(this.roadmapUrl, payload);
+      const targetUrl = this.getRoadmapUrl();
+      this.logger.log(`Calling Python Roadmap API at ${targetUrl}...`);
+      const response = await axios.post(targetUrl, payload);
 
       const roadmapData = response.data;
 

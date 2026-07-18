@@ -8,15 +8,18 @@ import axios from 'axios';
 export class ChatService {
   private readonly logger = new Logger(ChatService.name);
   private readonly prisma: PrismaClient;
-  private readonly counselorUrl = process.env.COUNSELOR_SERVICE_URL || 'http://localhost:8002/chat';
-
-  constructor() {
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const adapter = new PrismaPg(pool);
-    this.prisma = new PrismaClient({ adapter });
+  private getCounselorUrl(): string {
+    const raw = process.env.COUNSELOR_SERVICE_URL || 'http://localhost:8002/chat';
+    return raw.endsWith('/chat') ? raw : `${raw.replace(/\/+$/, '')}/chat`;
   }
 
   async handleMessage(sessionId: string, message: string): Promise<{ reply: string; is_ready: boolean }> {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!sessionId || !uuidRegex.test(sessionId)) {
+      sessionId = require('crypto').randomUUID();
+      this.logger.warn(`Invalid session_id provided. Generated new UUID: ${sessionId}`);
+    }
+
     this.logger.log(`Processing message for session: ${sessionId}`);
 
     // 1. Đảm bảo session tồn tại trong Database
@@ -140,8 +143,9 @@ export class ChatService {
 
     // 6. Gọi sang Python Counselor Service
     try {
-      this.logger.log(`Calling Python Counselor API at ${this.counselorUrl}...`);
-      const response = await axios.post(this.counselorUrl, {
+      const targetUrl = this.getCounselorUrl();
+      this.logger.log(`Calling Python Counselor API at ${targetUrl}...`);
+      const response = await axios.post(targetUrl, {
         session_id: sessionId,
         message: message,
         target_field: 'General',

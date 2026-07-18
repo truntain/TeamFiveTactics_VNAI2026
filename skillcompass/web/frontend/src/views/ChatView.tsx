@@ -4,14 +4,26 @@ import { Send, Loader2 } from 'lucide-react';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teamfivetactics-vnai2026-1.onrender.com';
 
-const getSessionId = () => {
-  if (typeof window === 'undefined') return 'session_default';
-  let sid = sessionStorage.getItem('skillcompass_session_id');
-  if (!sid) {
-    sid = 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-    sessionStorage.setItem('skillcompass_session_id', sid);
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
   }
-  return sid;
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
+const getSessionId = () => {
+  if (typeof window === 'undefined') return '00000000-0000-0000-0000-000000000000';
+  let sid = sessionStorage.getItem('skillcompass_session_id');
+  const isValidUuid = sid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid);
+  if (!isValidUuid) {
+    sid = generateUUID();
+    sessionStorage.setItem('skillcompass_session_id', sid!);
+  }
+  return sid!;
 };
 
 function ChatView({ onNavigate }: { onNavigate: (v: View) => void }) {
@@ -44,6 +56,17 @@ function ChatView({ onNavigate }: { onNavigate: (v: View) => void }) {
         body: JSON.stringify({ session_id: sessionId, message: userMsg }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        setMsgs(p => [
+          ...p,
+          {
+            role: 'ai',
+            text: (data && data.message) ? (typeof data.message === 'string' ? data.message : JSON.stringify(data.message)) : 'Rất tiếc, đã có lỗi kết nối tới hệ thống tư vấn AI.',
+            isFinal: false
+          }
+        ]);
+        return;
+      }
       setMsgs(p => [
         ...p,
         {
