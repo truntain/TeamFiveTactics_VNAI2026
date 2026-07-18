@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from '../types';
 import Nav from '../components/Nav';
 import HomeView from '../views/HomeView';
@@ -10,17 +10,74 @@ import ChatView from '../views/ChatView';
 import ResultsView from '../views/ResultsView';
 import MarketView from '../views/MarketView';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teamfivetactics-vnai2026-1.onrender.com';
+
 export default function SkillCompassApp() {
   const [view, setView] = useState<View>('home');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  const [email, setEmail] = useState('demo@gmail.com');
+  const [password, setPassword] = useState('abc@123');
+  const [username, setUsername] = useState('demo');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
 
   const navigate = (v: View) => setView(v);
   const showNav = view !== 'chat';
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setIsAuthOpen(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        setIsLoggedIn(true);
+      }
+    }
+  }, []);
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+
+    const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+    const payload = authMode === 'login' 
+      ? { email, password }
+      : { email, password, username };
+
+    try {
+      const res = await fetch(`${BACKEND_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Đã xảy ra lỗi trong quá trình xác thực.');
+      }
+
+      if (data.access_token) {
+        localStorage.setItem('access_token', data.access_token);
+        if (data.user) {
+          localStorage.setItem('user_info', JSON.stringify(data.user));
+        }
+        setIsLoggedIn(true);
+        setIsAuthOpen(false);
+      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Không thể kết nối đến máy chủ.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_info');
+    setIsLoggedIn(false);
     setView('home');
   };
 
@@ -104,7 +161,7 @@ export default function SkillCompassApp() {
         .btn-secondary:hover { background: #F5F5F5 !important; border-color: rgba(6,4,14,0.2) !important; }
       `}</style>
 
-      {showNav && <Nav onNavigate={navigate} onOpenAuth={() => setIsAuthOpen(true)} isLoggedIn={isLoggedIn} onLogout={() => setIsLoggedIn(false)} />}
+      {showNav && <Nav onNavigate={navigate} onOpenAuth={() => setIsAuthOpen(true)} isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
 
       {isAuthOpen && (
         <div style={{
@@ -117,34 +174,63 @@ export default function SkillCompassApp() {
             borderRadius: '20px', width: '100%', maxWidth: '440px',
             padding: '40px'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <h2 style={{ fontWeight: 500, fontSize: '32px', lineHeight: '36px', color: '#06040E' }}>Đăng nhập</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontWeight: 500, fontSize: '28px', lineHeight: '32px', color: '#06040E' }}>
+                {authMode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}
+              </h2>
               <button onClick={() => setIsAuthOpen(false)} style={{
                 background: 'transparent', border: 'none', fontSize: '24px', lineHeight: '28px', cursor: 'pointer', color: 'rgba(6,4,14,0.4)'
               }}>×</button>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
-              <div>
-                <label style={{ display: 'block', fontWeight: 500, fontSize: '16px', lineHeight: '20px', color: '#06040E', marginBottom: '8px' }}>Email</label>
-                <input type="email" placeholder="name@company.com" style={{
-                  width: '100%', height: '48px', borderRadius: '20px', background: '#F5F5F5',
-                  border: '1px solid transparent', padding: '0 16px', fontSize: '16px', lineHeight: '20px', color: '#06040E', outline: 'none'
-                }} onFocus={e => e.target.style.border = '1px solid rgba(16,36,47,0.3)'} onBlur={e => e.target.style.border = '1px solid transparent'} />
+
+            {authError && (
+              <div style={{ background: '#FCE8E6', color: '#D93025', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', marginBottom: '20px' }}>
+                {authError}
               </div>
-              <div>
-                <label style={{ display: 'block', fontWeight: 500, fontSize: '16px', lineHeight: '20px', color: '#06040E', marginBottom: '8px' }}>Mật khẩu</label>
-                <input type="password" placeholder="••••••••" style={{
-                  width: '100%', height: '48px', borderRadius: '20px', background: '#F5F5F5',
-                  border: '1px solid transparent', padding: '0 16px', fontSize: '16px', lineHeight: '20px', color: '#06040E', outline: 'none'
-                }} onFocus={e => e.target.style.border = '1px solid rgba(16,36,47,0.3)'} onBlur={e => e.target.style.border = '1px solid transparent'} />
+            )}
+
+            <form onSubmit={handleAuthSubmit}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                {authMode === 'register' && (
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 500, fontSize: '15px', color: '#06040E', marginBottom: '6px' }}>Tên người dùng</label>
+                    <input type="text" value={username} onChange={e => setUsername(e.target.value)} required placeholder="demo" style={{
+                      width: '100%', height: '48px', borderRadius: '20px', background: '#F5F5F5',
+                      border: '1px solid transparent', padding: '0 16px', fontSize: '15px', color: '#06040E', outline: 'none'
+                    }} />
+                  </div>
+                )}
+                <div>
+                  <label style={{ display: 'block', fontWeight: 500, fontSize: '15px', color: '#06040E', marginBottom: '6px' }}>Email</label>
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="demo@gmail.com" style={{
+                    width: '100%', height: '48px', borderRadius: '20px', background: '#F5F5F5',
+                    border: '1px solid transparent', padding: '0 16px', fontSize: '15px', color: '#06040E', outline: 'none'
+                  }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontWeight: 500, fontSize: '15px', color: '#06040E', marginBottom: '6px' }}>Mật khẩu</label>
+                  <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" style={{
+                    width: '100%', height: '48px', borderRadius: '20px', background: '#F5F5F5',
+                    border: '1px solid transparent', padding: '0 16px', fontSize: '15px', color: '#06040E', outline: 'none'
+                  }} />
+                </div>
               </div>
-            </div>
-            <button className="gemini-gradient-btn" onClick={handleLogin} style={{
-              width: '100%', height: '56px', borderRadius: '28px',
-              border: 'none', fontWeight: 500, fontSize: '16px', lineHeight: '20px', cursor: 'pointer'
-            }}>Đăng nhập</button>
-            <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '16px', lineHeight: '20px', color: '#5F6368' }}>
-              Chưa có tài khoản? <span style={{ color: '#10242F', fontWeight: 500, cursor: 'pointer' }}>Đăng ký ngay</span>
+
+              <button type="submit" disabled={authLoading} className="gemini-gradient-btn" style={{
+                width: '100%', height: '52px', borderRadius: '26px',
+                border: 'none', fontWeight: 500, fontSize: '16px', cursor: authLoading ? 'wait' : 'pointer',
+                opacity: authLoading ? 0.7 : 1
+              }}>
+                {authLoading ? 'Đang xử lý...' : (authMode === 'login' ? 'Đăng nhập' : 'Đăng ký ngay')}
+              </button>
+            </form>
+
+            <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '15px', color: '#5F6368' }}>
+              {authMode === 'login' ? (
+                <>Chưa có tài khoản? <span onClick={() => { setAuthMode('register'); setAuthError(''); }} style={{ color: '#0260FF', fontWeight: 500, cursor: 'pointer' }}>Đăng ký ngay</span></>
+              ) : (
+                <>Đã có tài khoản? <span onClick={() => { setAuthMode('login'); setAuthError(''); }} style={{ color: '#0260FF', fontWeight: 500, cursor: 'pointer' }}>Đăng nhập</span></>
+              )}
             </p>
           </div>
         </div>
