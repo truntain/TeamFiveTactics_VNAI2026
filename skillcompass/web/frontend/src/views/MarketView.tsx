@@ -448,6 +448,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                   <div className="modal-header" style={{ padding: '40px 80px 20px 40px', borderBottom: '1px solid rgba(6,4,14,0.06)', background: '#FFFFFF' }}>
                     <span style={{
                       display: 'inline-block',
+                      fontFamily: '"Google Sans Flex", sans-serif',
                       fontSize: '13px', fontWeight: 700, color: '#0260FF',
                       textTransform: 'uppercase', letterSpacing: '1px', background: '#F0F4FF',
                       padding: '6px 12px', borderRadius: '20px'
@@ -455,7 +456,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                       {jobDetail.track_type}
                     </span>
 
-                    <h3 style={{ fontWeight: 600, fontSize: '28px', lineHeight: '34px', color: '#06040E', marginTop: '16px', marginBottom: 0 }}>
+                    <h3 style={{ fontFamily: '"Google Sans Flex", sans-serif', fontWeight: 600, fontSize: '28px', lineHeight: '34px', color: '#06040E', marginTop: '16px', marginBottom: 0 }}>
                       {jobDetail.career_track}
                     </h3>
                   </div>
