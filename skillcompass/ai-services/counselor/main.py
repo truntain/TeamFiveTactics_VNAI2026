@@ -98,45 +98,56 @@ async def chat_endpoint(request: ChatRequest):
             )
             
             turn_count = len(history) // 2
-            # Cấu hình chuỗi câu hỏi cố định khớp 100% với các Quick Reply Chips trên frontend
-            demo_flow = {
-                1: {
-                    "trait": "continuous_learning",
-                    "question": "Khi học một kiến thức mới (ví dụ học tập, kỹ năng hay lập trình), bạn thường tiếp thu tốt nhất theo cách nào?"
+            # Nhận diện ngành học từ tin nhắn đầu tiên của user trong lịch sử
+            first_user_msg = ""
+            for msg in history:
+                if msg.get("role") == "user":
+                    first_user_msg = msg.get("content", "")
+                    break
+            
+            field = "General"
+            if "Công nghệ thông tin" in first_user_msg:
+                field = "IT"
+            elif "Kinh tế" in first_user_msg or "Kinh doanh" in first_user_msg:
+                field = "Business"
+
+            flows = {
+                "General": {
+                    1: {"trait": "continuous_learning", "question": "Khi học một kiến thức mới (ví dụ học tập, kỹ năng), bạn thường tiếp thu tốt nhất theo cách nào?"},
+                    2: {"trait": "adaptability_resilience", "question": "Giả sử bạn chuẩn bị thuyết trình nhóm nhưng nói vấp và kết quả không như kỳ vọng. Bạn cảm thấy và phản ứng thế nào sau đó?"},
+                    3: {"trait": "team_collaboration", "question": "Trong dự án nhóm ở lớp, bạn thường đảm nhận vai trò nào và cảm thấy thoải mái nhất với vị trí đó?"},
+                    4: {"trait": "analytical_thinking", "question": "Nếu được lựa chọn tự do, bạn thích dành một ngày làm việc trong môi trường như thế nào nhất?"},
+                    5: {"trait": "creativity_innovation", "question": "Bạn được giao nhiệm vụ: 'Hãy làm cho buổi họp lớp trở nên thú vị hơn — bạn có toàn quyền sáng tạo.' Bạn sẽ làm gì?"},
+                    6: {"trait": "critical_thinking", "question": "Nhiều người thành công không nhất thiết phải đi theo con đường Đại học truyền thống. Bạn nghĩ thế nào và bạn đang hướng đến con đường nào?"},
+                    7: {"trait": "responsibility_autonomy", "question": "Gia đình bạn có định hướng hay kỳ vọng gì về ngành nghề bạn sẽ chọn không? Bạn cảm thấy thế nào với điều đó?"},
+                    8: {"trait": "work_ethics_integrity", "question": "Trong 5 năm tới, bạn hình dung bản thân đang làm gì? Hãy mô tả ngắn gọn nhất có thể."},
+                    9: {"trait": "analytical_thinking", "question": "Câu hỏi cuối nhé! Trong danh sách các kỹ năng sau, bạn tự thấy mình nổi bật nhất ở điều gì?"}
                 },
-                2: {
-                    "trait": "adaptability_resilience",
-                    "question": "Giả sử bạn chuẩn bị thuyết trình nhóm nhưng nói vấp và kết quả không như kỳ vọng. Bạn cảm thấy và phản ứng thế nào sau đó?"
+                "IT": {
+                    1: {"trait": "continuous_learning", "question": "Khi học một kiến thức lập trình hay công nghệ mới, bạn tiếp thu tốt nhất bằng cách nào?"},
+                    2: {"trait": "adaptability_resilience", "question": "Khi code bị lỗi (bug) phức tạp chạy mãi không được, bạn thường xử lý áp lực đó thế nào?"},
+                    3: {"trait": "team_collaboration", "question": "Trong các dự án làm phần mềm nhóm, bạn thích làm Tech Lead thiết kế, Developer tập trung code hay Scrum Master gắn kết?"},
+                    4: {"trait": "analytical_thinking", "question": "Trong ngành CNTT, bạn thích ngồi viết code thuật toán, thiết kế giải pháp hệ thống hay nghiên cứu AI/ML mới?"},
+                    5: {"trait": "creativity_innovation", "question": "Nếu được giao làm một sản phẩm sáng tạo cho lớp, bạn sẽ viết một app/web mini kết nối, tích hợp chatbot AI hay tổ chức hackathon?"},
+                    6: {"trait": "critical_thinking", "question": "Lập trình viên có nhất thiết phải học Đại học chính quy hay tự học/học bootcamp là đủ? Bạn hướng đi thế nào?"},
+                    7: {"trait": "responsibility_autonomy", "question": "Gia đình có ủng hộ đam mê theo đuổi ngành Công nghệ thông tin của bạn không? Bạn tự quyết định hay theo ý kiến bố mẹ?"},
+                    8: {"trait": "work_ethics_integrity", "question": "Mục tiêu 5 năm tới của bạn là trở thành Senior Dev/Tech Lead, làm chủ startup công nghệ hay chuyên gia AI/Data?"},
+                    9: {"trait": "analytical_thinking", "question": "Câu hỏi lập trình cuối nhé! Bạn tự đánh giá mình mạnh nhất ở tư duy giải thuật, khả năng tự học công nghệ mới hay thiết kế hệ thống?"}
                 },
-                3: {
-                    "trait": "team_collaboration",
-                    "question": "Trong dự án nhóm ở lớp, bạn thường đảm nhận vai trò nào và cảm thấy thoải mái nhất với vị trí đó?"
-                },
-                4: {
-                    "trait": "analytical_thinking",
-                    "question": "Nếu được lựa chọn tự do, bạn thích dành một ngày làm việc trong môi trường như thế nào nhất?"
-                },
-                5: {
-                    "trait": "creativity_innovation",
-                    "question": "Bạn được giao nhiệm vụ: 'Hãy làm cho buổi họp lớp trở nên thú vị hơn — bạn có toàn quyền sáng tạo.' Bạn sẽ làm gì?"
-                },
-                6: {
-                    "trait": "critical_thinking",
-                    "question": "Nhiều người thành công không nhất thiết phải đi theo con đường Đại học truyền thống. Bạn nghĩ thế nào và bạn đang hướng đến con đường nào?"
-                },
-                7: {
-                    "trait": "responsibility_autonomy",
-                    "question": "Gia đình bạn có định hướng hay kỳ vọng gì về ngành nghề bạn sẽ chọn không? Bạn cảm thấy thế nào với điều đó?"
-                },
-                8: {
-                    "trait": "work_ethics_integrity",
-                    "question": "Trong 5 năm tới, bạn hình dung bản thân đang làm gì? Hãy mô tả ngắn gọn nhất có thể."
-                },
-                9: {
-                    "trait": "analytical_thinking",
-                    "question": "Câu hỏi cuối nhé! Trong danh sách các kỹ năng sau, bạn tự thấy mình nổi bật nhất ở điều gì?"
+                "Business": {
+                    1: {"trait": "continuous_learning", "question": "Khi học về quản trị hay kinh tế, bạn thích phân tích case study doanh nghiệp, chơi game giả lập hay thuyết trình nhóm?"},
+                    2: {"trait": "adaptability_resilience", "question": "Nếu kế hoạch kinh doanh nhóm của bạn gặp thất bại không đạt mục tiêu/KPI, bạn sẽ xử lý thế nào?"},
+                    3: {"trait": "team_collaboration", "question": "Trong nhóm làm dự án kinh tế, bạn muốn làm trưởng nhóm lên chiến lược, chuyên viên phân tích số liệu hay người thương lượng đối tác?"},
+                    4: {"trait": "analytical_thinking", "question": "Bạn thấy mình hứng thú làm về quản lý tài chính/ngân sách, gặp gỡ đàm phán với khách hàng hay lên quy trình vận hành?"},
+                    5: {"trait": "creativity_innovation", "question": "Để thu hút học sinh tham gia câu lạc bộ khởi nghiệp, bạn sẽ tổ chức game giả lập, mời doanh nhân chia sẻ hay làm chiến dịch marketing độc đáo?"},
+                    6: {"trait": "critical_thinking", "question": "Lập trình viên có nhất thiết phải học Đại học chính quy ngành Quản lý hay tự kinh doanh để tích lũy thực chiến? Bạn hướng đi thế nào?"},
+                    7: {"trait": "responsibility_autonomy", "question": "Gia đình có định hướng bạn tiếp quản kinh doanh hay kỳ vọng gì về ngành nghề của bạn không? Bạn cảm thấy thế nào?"},
+                    8: {"trait": "work_ethics_integrity", "question": "Trong 5 năm tới, bạn muốn làm quản lý kinh doanh, sở hữu chuỗi kinh doanh riêng hay chuyên gia phân tích tài chính?"},
+                    9: {"trait": "analytical_thinking", "question": "Câu hỏi cuối nhé! Kỹ năng kinh doanh nổi bật nhất của bạn là giao tiếp đàm phán, nhạy bén số liệu thị trường hay lập kế hoạch tổ chức?"}
                 }
             }
+
+            demo_flow = flows[field]
 
             if current_state_dict.get("is_ready") or turn_count >= 10:
                 current_state_dict["is_ready"] = True

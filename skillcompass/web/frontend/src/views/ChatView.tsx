@@ -36,74 +36,191 @@ const startNewSession = (): string => {
 // ─────────────────────────────────────────────
 type ChipSet = { label: string; value: string }[];
 
-const QUICK_REPLIES: ChipSet[] = [
-  // Turn 0 — câu mở đầu: ngành quan tâm
-  [
-    { label: 'Công nghệ thông tin', value: 'Mình đang quan tâm đến ngành Công nghệ thông tin' },
-    { label: 'Y Dược / Sức khỏe',   value: 'Mình đang quan tâm đến ngành Y Dược và chăm sóc sức khỏe' },
-    { label: 'Kinh tế / Kinh doanh', value: 'Mình đang quan tâm đến ngành Kinh tế hoặc Kinh doanh' },
-    { label: 'Thiết kế / Nghệ thuật', value: 'Mình đang quan tâm đến lĩnh vực Thiết kế và Nghệ thuật' },
-    { label: 'Marketing / Truyền thông', value: 'Mình đang quan tâm đến ngành Marketing hoặc Truyền thông' },
-    { label: 'Chưa biết, cần tư vấn', value: 'Mình chưa biết nên học ngành gì, cần được tư vấn' },
+const QUICK_REPLIES: Record<string, ChipSet[]> = {
+  General: [
+    // Turn 0 — câu mở đầu: ngành quan tâm
+    [
+      { label: 'Công nghệ thông tin', value: 'Mình đang quan tâm đến ngành Công nghệ thông tin' },
+      { label: 'Y Dược / Sức khỏe',   value: 'Mình đang quan tâm đến ngành Y Dược và chăm sóc sức khỏe' },
+      { label: 'Kinh tế / Kinh doanh', value: 'Mình đang quan tâm đến ngành Kinh tế hoặc Kinh doanh' },
+      { label: 'Thiết kế / Nghệ thuật', value: 'Mình đang quan tâm đến lĩnh vực Thiết kế và Nghệ thuật' },
+      { label: 'Marketing / Truyền thông', value: 'Mình đang quan tâm đến ngành Marketing hoặc Truyền thông' },
+      { label: 'Chưa biết, cần tư vấn', value: 'Mình chưa biết nên học ngành gì, cần được tư vấn' },
+    ],
+    // Turn 1 — phong cách học tập
+    [
+      { label: 'Đọc sách & ghi chép', value: 'Mình thích đọc sách, ghi chú cẩn thận rồi tự làm bài tập từ lý thuyết' },
+      { label: 'Xem video & thực hành', value: 'Mình cần xem video và tự tay làm thử mới hiểu được' },
+      { label: 'Thảo luận & dạy lại', value: 'Mình học tốt nhất khi được giải thích cho người khác hoặc thảo luận nhóm' },
+    ],
+    // Turn 2 — xử lý áp lực / thất bại
+    [
+      { label: 'Phân tích lại, cải thiện ngay', value: 'Mình buồn một lúc nhưng sau đó tự hỏi mình sai ở đâu và cố gắng cải thiện cho lần sau' },
+      { label: 'Mất khá lâu mới lấy lại tinh thần', value: 'Mình khó chịu và cứ nghĩ mãi về chỗ vấp, mất khá lâu để lấy lại tinh thần' },
+      { label: 'Không để bụng, tiếp tục thôi', value: 'Mình thấy không sao, ai cũng có lúc thế, mình không quá để bụng' },
+    ],
+    // Turn 3 — vai trò trong nhóm
+    [
+      { label: 'Lên kế hoạch, phân công việc', value: 'Mình hay tự nhiên đứng ra phân công việc, nhắc deadline và tổng hợp bài cuối' },
+      { label: 'Làm thật tốt phần được giao', value: 'Mình thích được giao một phần cụ thể rồi tự làm thật tốt phần đó' },
+      { label: 'Kết nối & hòa giải trong nhóm', value: 'Mình hay đóng vai kết nối, đảm bảo mọi người hiểu nhau và không bị căng thẳng' },
+    ],
+    // Turn 4 — môi trường làm việc lý tưởng
+    [
+      { label: 'Phân tích dữ liệu / lập trình', value: 'Mình thích ngồi trước máy tính, code hoặc phân tích số liệu, giải quyết bài toán kỹ thuật' },
+      { label: 'Gặp gỡ & thuyết phục người khác', value: 'Mình thích gặp gỡ, trò chuyện với nhiều người, tư vấn hoặc thuyết phục họ' },
+      { label: 'Thiết kế / sáng tạo nội dung', value: 'Mình muốn được tạo ra thứ gì đó — vẽ, viết, thiết kế hoặc làm video' },
+      { label: 'Chăm sóc & hỗ trợ cộng đồng', value: 'Mình thích đi ra ngoài, chăm sóc người khác hoặc làm việc có ý nghĩa xã hội' },
+    ],
+    // Turn 5 — tư duy sáng tạo
+    [
+      { label: 'Đề xuất format / quy trình mới', value: 'Mình sẽ đề xuất một format mới, ví dụ mỗi người chia sẻ điều học được theo kiểu TED Talk ngắn' },
+      { label: 'Thêm game / bình chọn tương tác', value: 'Mình nghĩ sẽ thêm mini-game hoặc bình chọn trực tuyến để mọi người tương tác hơn' },
+      { label: 'Cần định hướng trước, chưa tự nghĩ được', value: 'Thật ra mình chưa biết bắt đầu từ đâu, cần xem người khác đề xuất gì đã' },
+    ],
+    // Turn 6 — đại học hay nghề
+    [
+      { label: 'Học Đại học chính quy', value: 'Mình vẫn muốn học Đại học chính quy vì bằng cấp quan trọng với ngành mình chọn' },
+      { label: 'Học nghề / Cao đẳng thực hành', value: 'Mình đang cân nhắc học nghề hoặc Cao đẳng để ra trường sớm và có việc làm nhanh hơn' },
+      { label: 'Tùy ngành, xem xét cả hai', value: 'Mình chưa chắc, nếu có con đường nào ngắn hơn mà hiệu quả mình cũng xem xét' },
+    ],
+    // Turn 7 — ảnh hưởng gia đình
+    [
+      { label: 'Mình tự quyết, đã có định hướng', value: 'Gia đình có ý kiến nhưng mình đã xác định được ngành mình muốn và tự tin thuyết phục họ' },
+      { label: 'Theo ý gia đình, dù không phải ưu tiên số 1', value: 'Gia đình muốn mình học ngành đó, mình không phản đối dù không phải ưu tiên số 1 của mình' },
+      { label: 'Chưa nói chuyện với gia đình, chưa rõ', value: 'Mình chưa nói chuyện với gia đình về điều này và cũng chưa rõ bản thân muốn gì' },
+    ],
+    // Turn 8 — tầm nhìn 5 năm
+    [
+      { label: 'Công việc ổn định, thu nhập tốt', value: 'Mình chưa biết rõ, chỉ muốn có công việc ổn định và thu nhập tốt' },
+      { label: 'Tự kinh doanh / có startup riêng', value: 'Mình muốn tự kinh doanh hoặc có startup nhỏ của riêng mình' },
+      { label: 'Tạo ra tác động xã hội', value: 'Mình muốn làm gì đó có ý nghĩa, giúp đỡ cộng đồng hoặc tạo ra tác động xã hội' },
+    ],
+    // Turn 9 — kỹ năng nổi bật tự nhận
+    [
+      { label: 'Phân tích logic & Tổ chức kế hoạch', value: 'Mình thấy mình nổi bật nhất ở kỹ năng phân tích tư duy logic và khả năng tổ chức lên kế hoạch' },
+      { label: 'Giao tiếp & Sáng tạo ý tưởng', value: 'Mình nổi bật nhất ở kỹ năng giao tiếp thuyết phục và tư duy sáng tạo ý tưởng mới' },
+      { label: 'Sáng tạo & Thực hành tay nghề', value: 'Mình mạnh nhất ở sáng tạo và các kỹ năng thực hành tay nghề cụ thể' },
+      { label: 'Đồng cảm & Lắng nghe', value: 'Mình được nhiều người nhận xét là có khả năng đồng cảm và lắng nghe tốt' },
+    ],
   ],
-  // Turn 1 — phong cách học tập
-  [
-    { label: 'Đọc sách & ghi chép', value: 'Mình thích đọc sách, ghi chú cẩn thận rồi tự làm bài tập từ lý thuyết' },
-    { label: 'Xem video & thực hành', value: 'Mình cần xem video và tự tay làm thử mới hiểu được' },
-    { label: 'Thảo luận & dạy lại', value: 'Mình học tốt nhất khi được giải thích cho người khác hoặc thảo luận nhóm' },
+  IT: [
+    // Turn 0
+    [],
+    // Turn 1 — phong cách học tập
+    [
+      { label: 'Đọc tài liệu & code thực hành', value: 'Mình thích đọc tài liệu kỹ thuật, tự tay viết code chạy thử mới hiểu được' },
+      { label: 'Xem video hướng dẫn làm theo', value: 'Mình cần xem video hướng dẫn từng bước rồi gõ code theo' },
+      { label: 'Làm nhóm giải thuật toán', value: 'Mình thích cùng nhóm thảo luận giải quyết các bài toán thuật toán hóc búa' },
+    ],
+    // Turn 2 — xử lý áp lực / thất bại
+    [
+      { label: 'Debug kiên trì tìm lỗi bằng được', value: 'Khi code bị lỗi, mình sẽ kiên trì ngồi debug, thử nhiều cách khác nhau cho đến khi chạy được' },
+      { label: 'Tra cứu Google / StackOverflow', value: 'Mình thường tra cứu Google hoặc StackOverflow để xem người khác giải quyết lỗi đó thế nào' },
+      { label: 'Hỏi Mentor/cộng đồng hỗ trợ', value: 'Mình sẽ đăng câu hỏi lên diễn đàn lập trình hoặc nhờ anh chị có kinh nghiệm hỗ trợ' },
+    ],
+    // Turn 3 — vai trò trong nhóm
+    [
+      { label: 'Tech Lead thiết kế hệ thống', value: 'Mình thích đảm nhận việc thiết kế cấu trúc hệ thống và hướng dẫn kỹ thuật cho các bạn' },
+      { label: 'Developer hoàn thành code của mình', value: 'Mình thích được giao module cụ thể rồi tập trung hoàn thành code của mình thật tốt' },
+      { label: 'Scrum Master gắn kết đội ngũ', value: 'Mình thích theo dõi tiến độ, giải quyết các vướng mắc của mọi người và thúc đẩy nhóm' },
+    ],
+    // Turn 4 — môi trường làm việc lý tưởng
+    [
+      { label: 'Lập trình giải bài toán thuật toán', value: 'Mình thích ngồi một mình tập trung viết code giải quyết các bài toán logic phức tạp' },
+      { label: 'Thiết kế giải pháp & kiến trúc', value: 'Mình thích trao đổi với khách hàng để vẽ ra sơ đồ kiến trúc giải pháp hệ thống' },
+      { label: 'Nghiên cứu công nghệ mới, AI/ML', value: 'Mình thích mò mẫm thử nghiệm các công nghệ mới nổi như trí tuệ nhân tạo AI hoặc học máy' },
+    ],
+    // Turn 5 — tư duy sáng tạo
+    [
+      { label: 'Xây dựng web/app mini giải trí', value: 'Mình sẽ viết một ứng dụng web hoặc game nhỏ để mọi người cùng kết nối chơi trực tuyến' },
+      { label: 'Tích hợp chatbot AI trả lời tự động', value: 'Mình nghĩ sẽ tích hợp một chatbot AI tự động để tạo không khí tương tác vui vẻ' },
+      { label: 'Đề xuất cuộc thi lập trình ngắn', value: 'Mình sẽ đề xuất tổ chức một thử thách code nhanh (Hackathon) giải trí quy mô nhỏ' },
+    ],
+    // Turn 6 — đại học hay nghề
+    [
+      { label: 'Đại học CNTT chính quy', value: 'Mình vẫn muốn học Đại học ngành Công nghệ thông tin để có nền tảng kiến trúc vững chắc' },
+      { label: 'Khóa học Bootcamps thực chiến nhanh', value: 'Mình đang cân nhắc học các khóa Bootcamps thực hành ngắn hạn để đi làm sớm hơn' },
+      { label: 'Vừa học vừa làm dự án thực tế', value: 'Mình thích học qua các dự án thực tiễn, tích lũy kinh nghiệm thực tế là chính' },
+    ],
+    // Turn 7 — ảnh hưởng gia đình
+    [
+      { label: 'Tự quyết định hướng CNTT', value: 'Gia đình tôn trọng và mình hoàn toàn tự quyết định theo đuổi đam mê công nghệ thông tin' },
+      { label: 'Gia đình ủng hộ, mình tự tin thuyết phục', value: 'Gia đình có chút lo lắng nhưng mình đã tự tin thuyết phục họ về triển vọng ngành này' },
+      { label: 'Chưa thảo luận kỹ với bố mẹ', value: 'Mình chưa nói chuyện nhiều với gia đình về quyết định chọn ngành công nghệ' },
+    ],
+    // Turn 8 — tầm nhìn 5 năm
+    [
+      { label: 'Senior Developer / Tech Lead', value: 'Mình hình dung 5 năm tới mình làm Senior Developer hoặc dẫn dắt đội ngũ kỹ thuật Tech Lead' },
+      { label: 'Khởi nghiệp startup công nghệ', value: 'Mình muốn tự phát triển sản phẩm công nghệ riêng và khởi nghiệp startup' },
+      { label: 'Chuyên gia AI / Kỹ sư Dữ liệu', value: 'Mình muốn trở thành chuyên gia chuyên sâu về lĩnh vực AI hoặc kỹ sư dữ liệu lớn' },
+    ],
+    // Turn 9 — kỹ năng nổi bật tự nhận
+    [
+      { label: 'Tư duy logic & giải quyết bug', value: 'Mình thấy mình nổi bật nhất ở khả năng tư duy logic phân tích và kiên trì giải quyết lỗi' },
+      { label: 'Tự học công nghệ & kiên trì', value: 'Điểm mạnh lớn nhất của mình là tự học nhanh các ngôn ngữ mới và kiên trì bám đuổi' },
+      { label: 'Thiết kế hệ thống & làm việc nhóm', value: 'Mình tự tin nhất ở khả năng thiết kế kiến trúc hệ thống và cộng tác tốt với team' },
+    ],
   ],
-  // Turn 2 — xử lý áp lực / thất bại
-  [
-    { label: 'Phân tích lại, cải thiện ngay', value: 'Mình buồn một lúc nhưng sau đó tự hỏi mình sai ở đâu và cố gắng cải thiện cho lần sau' },
-    { label: 'Mất khá lâu mới lấy lại tinh thần', value: 'Mình khó chịu và cứ nghĩ mãi về chỗ vấp, mất khá lâu để lấy lại tinh thần' },
-    { label: 'Không để bụng, tiếp tục thôi', value: 'Mình thấy không sao, ai cũng có lúc thế, mình không quá để bụng' },
-  ],
-  // Turn 3 — vai trò trong nhóm
-  [
-    { label: 'Lên kế hoạch, phân công việc', value: 'Mình hay tự nhiên đứng ra phân công việc, nhắc deadline và tổng hợp bài cuối' },
-    { label: 'Làm thật tốt phần được giao', value: 'Mình thích được giao một phần cụ thể rồi tự làm thật tốt phần đó' },
-    { label: 'Kết nối & hòa giải trong nhóm', value: 'Mình hay đóng vai kết nối, đảm bảo mọi người hiểu nhau và không bị căng thẳng' },
-  ],
-  // Turn 4 — môi trường làm việc lý tưởng
-  [
-    { label: 'Phân tích dữ liệu / lập trình', value: 'Mình thích ngồi trước máy tính, code hoặc phân tích số liệu, giải quyết bài toán kỹ thuật' },
-    { label: 'Gặp gỡ & thuyết phục người khác', value: 'Mình thích gặp gỡ, trò chuyện với nhiều người, tư vấn hoặc thuyết phục họ' },
-    { label: 'Thiết kế / sáng tạo nội dung', value: 'Mình muốn được tạo ra thứ gì đó — vẽ, viết, thiết kế hoặc làm video' },
-    { label: 'Chăm sóc & hỗ trợ cộng đồng', value: 'Mình thích đi ra ngoài, chăm sóc người khác hoặc làm việc có ý nghĩa xã hội' },
-  ],
-  // Turn 5 — tư duy sáng tạo
-  [
-    { label: 'Đề xuất format / quy trình mới', value: 'Mình sẽ đề xuất một format mới, ví dụ mỗi người chia sẻ điều học được theo kiểu TED Talk ngắn' },
-    { label: 'Thêm game / bình chọn tương tác', value: 'Mình nghĩ sẽ thêm mini-game hoặc bình chọn trực tuyến để mọi người tương tác hơn' },
-    { label: 'Cần định hướng trước, chưa tự nghĩ được', value: 'Thật ra mình chưa biết bắt đầu từ đâu, cần xem người khác đề xuất gì đã' },
-  ],
-  // Turn 6 — đại học hay nghề
-  [
-    { label: 'Học Đại học chính quy', value: 'Mình vẫn muốn học Đại học chính quy vì bằng cấp quan trọng với ngành mình chọn' },
-    { label: 'Học nghề / Cao đẳng thực hành', value: 'Mình đang cân nhắc học nghề hoặc Cao đẳng để ra trường sớm và có việc làm nhanh hơn' },
-    { label: 'Tùy ngành, xem xét cả hai', value: 'Mình chưa chắc, nếu có con đường nào ngắn hơn mà hiệu quả mình cũng xem xét' },
-  ],
-  // Turn 7 — ảnh hưởng gia đình
-  [
-    { label: 'Mình tự quyết, đã có định hướng', value: 'Gia đình có ý kiến nhưng mình đã xác định được ngành mình muốn và tự tin thuyết phục họ' },
-    { label: 'Theo ý gia đình, dù không phải ưu tiên số 1', value: 'Gia đình muốn mình học ngành đó, mình không phản đối dù không phải ưu tiên số 1 của mình' },
-    { label: 'Chưa nói chuyện với gia đình, chưa rõ', value: 'Mình chưa nói chuyện với gia đình về điều này và cũng chưa rõ bản thân muốn gì' },
-  ],
-  // Turn 8 — tầm nhìn 5 năm
-  [
-    { label: 'Làm tại công ty công nghệ', value: 'Mình đang hình dung 5 năm tới mình làm tại công ty công nghệ, phụ trách phát triển phần mềm hoặc dữ liệu' },
-    { label: 'Tự kinh doanh / có startup riêng', value: 'Mình muốn tự kinh doanh hoặc có startup nhỏ của riêng mình' },
-    { label: 'Công việc ổn định, thu nhập tốt', value: 'Mình chưa biết rõ, chỉ muốn có công việc ổn định và thu nhập tốt' },
-    { label: 'Tạo ra tác động xã hội', value: 'Mình muốn làm gì đó có ý nghĩa, giúp đỡ cộng đồng hoặc tạo ra tác động xã hội' },
-  ],
-  // Turn 9 — kỹ năng nổi bật tự nhận
-  [
-    { label: 'Phân tích logic & Tổ chức kế hoạch', value: 'Mình thấy mình nổi bật nhất ở kỹ năng phân tích tư duy logic và khả năng tổ chức lên kế hoạch' },
-    { label: 'Giao tiếp & Sáng tạo ý tưởng', value: 'Mình nổi bật nhất ở kỹ năng giao tiếp thuyết phục và tư duy sáng tạo ý tưởng mới' },
-    { label: 'Sáng tạo & Thực hành tay nghề', value: 'Mình mạnh nhất ở sáng tạo và các kỹ năng thực hành tay nghề cụ thể' },
-    { label: 'Đồng cảm & Lắng nghe', value: 'Mình được nhiều người nhận xét là có khả năng đồng cảm và lắng nghe tốt' },
-  ],
-];
+  Business: [
+    // Turn 0
+    [],
+    // Turn 1 — phong cách học tập
+    [
+      { label: 'Phân tích case study thực tế', value: 'Mình thích nghiên cứu các tình huống thực tiễn của các doanh nghiệp để rút ra bài học' },
+      { label: 'Thực hành qua dự án giả lập', value: 'Mình học tốt nhất khi được tham gia các trò chơi giả lập kinh doanh hoặc bài tập thực tế' },
+      { label: 'Thảo luận nhóm & thuyết trình', value: 'Mình học nhanh nhất khi tranh luận nhóm và chuẩn bị bài thuyết trình trước lớp' },
+    ],
+    // Turn 2 — xử lý áp lực / thất bại
+    [
+      { label: 'Phân tích dữ liệu tìm nguyên nhân', value: 'Mình sẽ kiểm tra lại các số liệu kinh doanh để tìm xem kế hoạch bị hỏng ở bước nào' },
+      { label: 'Mất tinh thần, lo lắng doanh số', value: 'Mình cảm thấy khá áp lực và lo lắng về chỉ tiêu doanh số/KPI của nhóm' },
+      { label: 'Tìm lời khuyên từ Mentor', value: 'Mình sẽ chủ động tìm các anh chị đi trước để xin lời khuyên vượt qua khủng hoảng' },
+    ],
+    // Turn 3 — vai trò trong nhóm
+    [
+      { label: 'Trưởng nhóm phân công công việc', value: 'Mình thích đóng vai trò lên chiến lược, phân chia nhiệm vụ và đôn đốc tiến độ cả nhóm' },
+      { label: 'Chuyên viên phân tích số liệu', value: 'Mình thích ngồi xử lý dữ liệu, làm báo cáo tài chính hoặc nghiên cứu thị trường' },
+      { label: 'Người thương lượng & kết nối đối tác', value: 'Mình mạnh nhất ở khâu đàm phán, thuyết phục khách hàng và kết nối mọi người' },
+    ],
+    // Turn 4 — môi trường làm việc lý tưởng
+    [
+      { label: 'Quản lý dòng tiền & tài chính', value: 'Mình thích làm việc với các báo cáo tài chính, quản lý ngân sách và tối ưu chi phí' },
+      { label: 'Gặp gỡ khách hàng & đàm phán', value: 'Mình muốn có một ngày bận rộn gặp gỡ đối tác, thương lượng và chốt các hợp đồng kinh doanh' },
+      { label: 'Lên kế hoạch vận hành doanh nghiệp', value: 'Mình thích thiết lập quy trình vận hành, tối ưu năng suất làm việc của bộ máy' },
+    ],
+    // Turn 5 — tư duy sáng tạo
+    [
+      { label: 'Tổ chức đấu trí kinh doanh', value: 'Mình sẽ tổ chức một mini-game đấu trí kinh doanh giả lập để tạo sự hào hứng tương tác' },
+      { label: 'Mời diễn giả chia sẻ thực tế', value: 'Mình sẽ mời các cựu học sinh thành công về chia sẻ câu chuyện khởi nghiệp thực tế' },
+      { label: 'Chiến dịch truyền thông hấp dẫn', value: 'Mình sẽ thiết kế một chiến dịch truyền thông độc đáo để thu hút mọi người tham gia' },
+    ],
+    // Turn 6 — đại học hay nghề
+    [
+      { label: 'Đại học Quản trị / Tài chính', value: 'Mình hướng tới học Đại học chính quy chuyên ngành Quản trị hoặc Tài chính doanh nghiệp' },
+      { label: 'Khóa đào tạo ngắn thực chiến', value: 'Mình muốn tham gia các khóa học thực tế ngắn hạn về kỹ năng bán hàng/marketing thực chiến' },
+      { label: 'Tự kinh doanh nhỏ trải nghiệm', value: 'Mình muốn tự khởi nghiệp kinh doanh nhỏ ngay để lấy cọ xát thực tế' },
+    ],
+    // Turn 7 — ảnh hưởng gia đình
+    [
+      { label: 'Tự quyết định hướng kinh doanh', value: 'Gia đình ủng hộ và mình được tự do theo đuổi các ý tưởng kinh doanh riêng' },
+      { label: 'Tiếp quản / theo định hướng gia đình', value: 'Gia đình có nền tảng kinh doanh sẵn và mình muốn đi theo định hướng đó' },
+      { label: 'Chưa thảo luận sâu với bố mẹ', value: 'Mình chưa bàn bạc kỹ với gia đình về kế hoạch khởi nghiệp/kinh doanh' },
+    ],
+    // Turn 8 — tầm nhìn 5 năm
+    [
+      { label: 'Quản lý / Giám đốc kinh doanh', value: 'Mình muốn trở thành quản lý kinh doanh hoặc giám đốc vận hành dự án' },
+      { label: 'Vận hành chuỗi kinh doanh riêng', value: 'Mục tiêu của mình là làm chủ một chuỗi cửa hàng hoặc mô hình kinh doanh riêng' },
+      { label: 'Chuyên gia phân tích tài chính', value: 'Mình muốn làm việc tại các quỹ đầu tư lớn với vai trò chuyên viên phân tích tài chính' },
+    ],
+    // Turn 9 — kỹ năng nổi bật tự nhận
+    [
+      { label: 'Giao tiếp thuyết phục & đàm phán', value: 'Kỹ năng mạnh nhất của mình là giao tiếp thuyết phục người khác và đàm phán thương lượng' },
+      { label: 'Nhạy bén số liệu & thị trường', value: 'Mình tự tin ở sự nhạy bén với các con số tài chính và xu hướng biến động thị trường' },
+      { label: 'Lập kế hoạch & tổ chức đội ngũ', value: 'Thế mạnh của mình là khả năng bao quát, tổ chức và vận hành đội ngũ hiệu quả' },
+    ],
+  ]
+};
 
 const INITIAL_MSG = [{ role: 'ai' as const, text: 'Xin chào! Mình là SkillCompass 🎯\n\nMình ở đây để giúp bạn tìm ra ngành học và nghề nghiệp thực sự phù hợp với con người của bạn — không phải theo xu hướng, không phải vì áp lực xung quanh.\n\n👉 Bạn đang quan tâm đến ngành nghề hoặc lĩnh vực nào không?\n   Nếu có rồi — hãy kể cho mình nghe, mình sẽ tư vấn ngay!\n   Nếu chưa biết — cũng không sao, mình có bài đánh giá ngắn giúp bạn khám phá điểm mạnh và tìm ra hướng đi phù hợp nhất.', isFinal: false }];
 
@@ -192,12 +309,22 @@ function ChatView({ onNavigate }: { onNavigate: (v: View) => void }) {
     await sendMessage(value);
   };
 
-  // Xác định bộ chip phù hợp với lượt hội thoại hiện tại
+  // Xác định bộ chip phù hợp với lượt hội thoại hiện tại và ngành nghề người dùng đã chọn ở lượt 0
   const userTurns = msgs.filter(m => m.role === 'user').length;
   const totalTurns = 10;
   const pct = Math.min(Math.round((userTurns / totalTurns) * 100), 100);
-  const currentChips: ChipSet = (!isLoading && !usedChips && userTurns < QUICK_REPLIES.length)
-    ? QUICK_REPLIES[userTurns]
+
+  // Nhận diện ngành nghề từ tin nhắn đầu tiên của user
+  const firstUserMsg = msgs.find(m => m.role === 'user')?.text || '';
+  let field = 'General';
+  if (firstUserMsg.includes('Công nghệ thông tin')) {
+    field = 'IT';
+  } else if (firstUserMsg.includes('Kinh tế') || firstUserMsg.includes('Kinh doanh')) {
+    field = 'Business';
+  }
+
+  const currentChips: ChipSet = (!isLoading && !usedChips && userTurns < QUICK_REPLIES[field].length)
+    ? QUICK_REPLIES[field][userTurns]
     : [];
   const isSessionDone = msgs.some(m => m.isFinal);
 

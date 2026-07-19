@@ -1,5 +1,6 @@
 import requests
 import json
+import uuid
 
 # API Endpoint of Agent 2
 API_URL = "http://localhost:8002/chat"
