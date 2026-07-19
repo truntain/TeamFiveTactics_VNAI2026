@@ -87,7 +87,7 @@ function ResultsView({ onNavigate }: { onNavigate: (v: View) => void }) {
                 sessionStorage.removeItem('skillcompass_session_id');
                 localStorage.removeItem('skillcompass_session_id');
               }
-              onNavigate('prechat');
+              onNavigate('chat');
             }}
             style={{
               display: 'flex', alignItems: 'center', gap: '8px',
