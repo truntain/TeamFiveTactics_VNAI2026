@@ -97,26 +97,63 @@ async def chat_endpoint(request: ChatRequest):
                 history
             )
             
-            # Routing Logic & Graceful Closing
             turn_count = len(history) // 2
-            traits = framework_dict.get("traits_to_evaluate", {})
-            avg_confidence = sum(current_state_dict.get("confidence_scores", {}).values()) / len(traits) if traits else 0
-            is_traits_done = (avg_confidence > 0.75 or turn_count >= 10)
-            
-            if current_state_dict.get("is_ready"):
-                # Khi đã đủ điểm, CẤM Counselor hỏi thêm. Yêu cầu nói lời chào kết thúc.
-                counselor_instruction = "LƯU Ý HỆ THỐNG: Đã thu thập đủ thông tin. KHÔNG hỏi thêm câu nào nữa. Hãy đưa ra lời cảm ơn, nhận xét tích cực và thông báo rằng hệ thống đang tiến hành phân tích để trả về lộ trình nghề nghiệp."
+            # Cấu hình chuỗi câu hỏi cố định khớp 100% với các Quick Reply Chips trên frontend
+            demo_flow = {
+                1: {
+                    "trait": "continuous_learning",
+                    "question": "Khi học một kiến thức mới (ví dụ học tập, kỹ năng hay lập trình), bạn thường tiếp thu tốt nhất theo cách nào?"
+                },
+                2: {
+                    "trait": "adaptability_resilience",
+                    "question": "Giả sử bạn chuẩn bị thuyết trình nhóm nhưng nói vấp và kết quả không như kỳ vọng. Bạn cảm thấy và phản ứng thế nào sau đó?"
+                },
+                3: {
+                    "trait": "team_collaboration",
+                    "question": "Trong dự án nhóm ở lớp, bạn thường đảm nhận vai trò nào và cảm thấy thoải mái nhất với vị trí đó?"
+                },
+                4: {
+                    "trait": "analytical_thinking",
+                    "question": "Nếu được lựa chọn tự do, bạn thích dành một ngày làm việc trong môi trường như thế nào nhất?"
+                },
+                5: {
+                    "trait": "creativity_innovation",
+                    "question": "Bạn được giao nhiệm vụ: 'Hãy làm cho buổi họp lớp trở nên thú vị hơn — bạn có toàn quyền sáng tạo.' Bạn sẽ làm gì?"
+                },
+                6: {
+                    "trait": "critical_thinking",
+                    "question": "Nhiều người thành công không nhất thiết phải đi theo con đường Đại học truyền thống. Bạn nghĩ thế nào và bạn đang hướng đến con đường nào?"
+                },
+                7: {
+                    "trait": "responsibility_autonomy",
+                    "question": "Gia đình bạn có định hướng hay kỳ vọng gì về ngành nghề bạn sẽ chọn không? Bạn cảm thấy thế nào với điều đó?"
+                },
+                8: {
+                    "trait": "work_ethics_integrity",
+                    "question": "Trong 5 năm tới, bạn hình dung bản thân đang làm gì? Hãy mô tả ngắn gọn nhất có thể."
+                },
+                9: {
+                    "trait": "analytical_thinking",
+                    "question": "Câu hỏi cuối nhé! Trong danh sách các kỹ năng sau, bạn tự thấy mình nổi bật nhất ở điều gì?"
+                }
+            }
+
+            if current_state_dict.get("is_ready") or turn_count >= 10:
+                current_state_dict["is_ready"] = True
+                counselor_instruction = "LƯU Ý HỆ THỐNG: Đã thu thập đủ 10 lượt thông tin. KHÔNG hỏi thêm câu nào nữa. Hãy đưa ra lời cảm ơn chân thành, nhận xét tích cực về thế mạnh của học sinh và thông báo rằng hệ thống đang phân tích lộ trình phát triển tối ưu."
+            elif turn_count in demo_flow:
+                next_trait = demo_flow[turn_count]["trait"]
+                target_question = demo_flow[turn_count]["question"]
+                counselor_instruction = (
+                    f"LƯU Ý HỆ THỐNG:\n"
+                    f"- Tiêu chí cần đánh giá hiện tại là: '{next_trait}'.\n"
+                    f"- Hãy đưa ra câu hỏi mốc mỏ neo sau đây: '{target_question}'.\n"
+                    f"- Hãy viết một câu cầu nối thấu cảm ngắn gọn với câu trả lời vừa rồi của học sinh, "
+                    f"sau đó dẫn dắt tự nhiên để đặt đúng câu hỏi mỏ neo ở trên."
+                )
             elif eval_result.get("is_off_topic"):
                 # Soft-Bridging: Xử lý khi người dùng nói lạc đề (chit-chat/troll)
                 counselor_instruction = "LƯU Ý HỆ THỐNG: Người dùng đang nói lạc đề. Hãy hùa theo họ 1 câu ngắn gọn vui vẻ, sau đó DÙNG TỪ NỐI (VD: À mà, Nhắc mới nhớ, Sẵn tiện) để bẻ lái mượt mà quay lại câu hỏi đánh giá đang bị dang dở."
-            elif is_traits_done and not current_state_dict.get("market_expectations", {}).get("asked_family"):
-                # Hỏi câu về gia đình
-                current_state_dict["market_expectations"]["asked_family"] = True
-                counselor_instruction = "LƯU Ý HỆ THỐNG: Đã thu thập đủ thông tin năng lực. Hãy hỏi: 'Gia đình bạn có định hướng gì cho bạn không, hay bạn được tự do lựa chọn hoàn toàn?' một cách thân thiện."
-            elif is_traits_done and not current_state_dict.get("market_expectations", {}).get("asked_health"):
-                # Hỏi câu về sức khỏe
-                current_state_dict["market_expectations"]["asked_health"] = True
-                counselor_instruction = "LƯU Ý HỆ THỐNG: Ghi nhận định hướng gia đình của học sinh, sau đó hãy đặt câu hỏi: 'Về sức khỏe, có điều gì đặc biệt bạn cần cân nhắc khi chọn ngành không?' một cách tế nhị."
             elif eval_result.get("warning_signal"):
                 # Phát hiện tín hiệu chọn sai nghề (theo trend, áp lực gia đình, v.v.)
                 counselor_instruction = (
@@ -126,9 +163,6 @@ async def chat_endpoint(request: ChatRequest):
                     "liệu sự lựa chọn này có thực sự đến từ đam mê và năng lực của bản thân không, "
                     "hay có yếu tố bên ngoài nào đang ảnh hưởng?"
                 )
-            elif current_state_dict.get("market_expectations", {}).get("expected_salary_min", 0) == 0 and turn_count > 3:
-                # Ép Counselor phải hỏi về lương/thị trường nếu sau 3 lượt chưa có
-                counselor_instruction = "LƯU Ý HỆ THỐNG: Ngay lập tức hỏi khéo về mức lương kỳ vọng và khu vực làm việc mong muốn của bạn học sinh."
             else:
                 # Xác định tiêu chí chưa hoàn thành tiếp theo và kết hợp câu hỏi tình huống
                 traits = framework_dict.get("traits_to_evaluate", {})

@@ -170,7 +170,7 @@ export class ChatService {
 
       const userMsgCount = conversationHistory.filter(m => m.role === 'user').length + 1;
       let replyText = '';
-      let isReady = userMsgCount >= 3;
+      let isReady = false;
 
       const fallbackPrompts = [
         'Rất thú vị! Bạn có thể chia sẻ cụ thể hơn về những bài tập, môn học hoặc dự án cá nhân mà bạn cảm thấy tự tin và hứng thú nhất không?',

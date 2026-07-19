@@ -1,8 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { View } from '../types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RotateCcw } from 'lucide-react';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teamfivetactics-vnai2026-1.onrender.com';
+
+const generateUUID = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+};
+
+const resetAndStartNewSession = () => {
+  if (typeof window === 'undefined') return;
+  const sid = generateUUID();
+  localStorage.setItem('skillcompass_session_id', sid);
+  sessionStorage.setItem('skillcompass_session_id', sid);
+};
 
 function ResultsView({ onNavigate }: { onNavigate: (v: View) => void }) {
   const [expandedIndices, setExpandedIndices] = useState<number[]>([]);
@@ -276,7 +291,35 @@ function ResultsView({ onNavigate }: { onNavigate: (v: View) => void }) {
           </>
         )}
 
-        <button className="gemini-pill" onClick={() => onNavigate('home')} style={{ marginTop: '48px', height: '56px', padding: '0 32px', borderRadius: '28px', border: '1px solid rgba(0,0,0,0.1)', fontWeight: 500, fontSize: '16px', color: '#06040E', background: '#FFFFFF', cursor: 'pointer' }}>Trở về Trang chủ</button>
+        <div style={{ marginTop: '48px', display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Nút tư vấn lại — tạo phiên mới và quay về chat */}
+          <button
+            className="gemini-gradient-btn"
+            onClick={() => {
+              resetAndStartNewSession();
+              onNavigate('chat');
+            }}
+            style={{
+              height: '56px', padding: '0 32px', borderRadius: '28px', cursor: 'pointer',
+              fontWeight: 500, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px'
+            }}
+          >
+            <RotateCcw size={18} />
+            Tư vấn định hướng lại
+          </button>
+
+          <button
+            className="gemini-pill"
+            onClick={() => onNavigate('home')}
+            style={{
+              height: '56px', padding: '0 32px', borderRadius: '28px',
+              border: '1px solid rgba(0,0,0,0.1)', fontWeight: 500, fontSize: '16px',
+              color: '#06040E', background: '#FFFFFF', cursor: 'pointer'
+            }}
+          >
+            Trở về Trang chủ
+          </button>
+        </div>
       </div>
     </div>
   );
