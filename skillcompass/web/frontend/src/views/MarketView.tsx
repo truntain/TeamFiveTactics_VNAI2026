@@ -75,14 +75,15 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                       onClick={() => setSelectedIndustry(ind)}
                       style={{
                         background: ind.gradient || 'linear-gradient(135deg, #0260FF 0%, #00C6FF 100%)',
-                        padding: '20px 24px', cursor: 'pointer', transition: 'opacity 0.2s'
+                        padding: '16px 24px', cursor: 'pointer', transition: 'opacity 0.2s',
+                        height: '88px', display: 'flex', alignItems: 'center'
                       }}
                       onMouseOver={(e) => { e.currentTarget.style.opacity = '0.9'; }}
                       onMouseOut={(e) => { e.currentTarget.style.opacity = '1'; }}
                     >
-                      <h3 style={{ fontWeight: 600, fontSize: '20px', lineHeight: '24px', margin: 0, color: '#FFFFFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {ind.title}
-                        <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.2)', padding: '4px 8px', borderRadius: '10px', fontWeight: 500, letterSpacing: '0.5px' }}>Xem tất cả &rarr;</span>
+                      <h3 style={{ fontWeight: 600, fontSize: '18px', lineHeight: '24px', margin: 0, color: '#FFFFFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                        <span>{ind.title}</span>
+                        <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.2)', padding: '4px 8px', borderRadius: '10px', fontWeight: 500, letterSpacing: '0.5px', whiteSpace: 'nowrap', marginLeft: '12px' }}>Xem tất cả &rarr;</span>
                       </h3>
                     </div>
                     <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
@@ -92,8 +93,8 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                           onClick={() => handleJobClick(job)}
                           style={{
                             display: 'flex', alignItems: 'center', gap: '12px', background: '#FFFFFF',
-                            padding: '14px 18px', borderRadius: '14px', border: '1px solid #EEF2F7',
-                            transition: 'all .2s ease', cursor: 'pointer'
+                            padding: '12px 18px', borderRadius: '14px', border: '1px solid #EEF2F7',
+                            transition: 'all .2s ease', cursor: 'pointer', minHeight: '68px'
                           }}
                           onMouseOver={(e) => {
                             e.currentTarget.style.borderColor = '#0260FF';
@@ -105,7 +106,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                           }}
                         >
                           <div style={{ fontWeight: 700, fontSize: '16px', lineHeight: '20px', color: '#0260FF' }}>{idx + 1}</div>
-                          <div style={{ fontWeight: 500, fontSize: '16px', lineHeight: '20px', color: '#06040E' }}>{job}</div>
+                          <div style={{ fontWeight: 500, fontSize: '15px', lineHeight: '20px', color: '#06040E' }}>{job}</div>
                         </div>
                       ))}
                     </div>
@@ -142,7 +143,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
               <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '20px', overflow: 'hidden', flex: 1, boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}>
                 <div style={{ background: '#FFFFFF', borderRadius: '20px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                   <div style={{ background: 'linear-gradient(135deg, #11998E 0%, #38EF7D 100%)', padding: '20px 24px' }}>
-                    <h3 style={{ fontWeight: 500, fontSize: '20px', lineHeight: '24px', margin: 0, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <h3 style={{ fontWeight: 600, fontSize: '20px', lineHeight: '24px', margin: 0, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '10px' }}>
                       Đang tăng trưởng (Tuyển dụng cao)
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
                     </h3>
@@ -178,7 +179,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
               <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '20px', overflow: 'hidden', flex: 1, boxShadow: '0 2px 8px rgba(0,0,0,.05)' }}>
                 <div style={{ background: '#FFFFFF', borderRadius: '20px', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                   <div style={{ background: 'linear-gradient(135deg, #D93025 0%, #FF4B2B 100%)', padding: '20px 24px' }}>
-                    <h3 style={{ fontWeight: 500, fontSize: '20px', lineHeight: '24px', margin: 0, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <h3 style={{ fontWeight: 600, fontSize: '20px', lineHeight: '24px', margin: 0, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '10px' }}>
                       Tuyển dụng ít (Cạnh tranh khốc liệt)
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"></polyline><polyline points="16 17 22 17 22 11"></polyline></svg>
                     </h3>
@@ -242,9 +243,9 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
               maxHeight: '85vh', overflowY: 'auto', padding: '40px', position: 'relative',
               boxShadow: '0 24px 64px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)'
             }}>
-              
+
               {/* Close Button */}
-              <button 
+              <button
                 onClick={() => setSelectedJob(null)}
                 style={{
                   position: 'absolute', top: '24px', right: '24px', border: 'none',
@@ -273,7 +274,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
                   }}>
                     {jobDetail.track_type}
                   </span>
-                  
+
                   <h3 style={{ fontWeight: 600, fontSize: '28px', lineHeight: '34px', color: '#06040E', marginTop: '16px', marginBottom: '12px' }}>
                     {jobDetail.career_track}
                   </h3>
@@ -393,9 +394,9 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
               maxHeight: '80vh', overflowY: 'auto', padding: '40px', position: 'relative',
               boxShadow: '0 24px 64px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)'
             }}>
-              
+
               {/* Close Button */}
-              <button 
+              <button
                 onClick={() => setSelectedIndustry(null)}
                 style={{
                   position: 'absolute', top: '24px', right: '24px', border: 'none',
