@@ -5,7 +5,7 @@ import logoImg from '../app/logo.png';
 function Nav({ currentView, onNavigate, onOpenAuth, isLoggedIn, onLogout }: { currentView: View, onNavigate: (v: View) => void, onOpenAuth: () => void, isLoggedIn: boolean, onLogout: () => void }) {
   const [profileOpen, setProfileOpen] = useState(false);
   return (
-    <header style={{ padding: '24px 48px 0', background: 'transparent', position: 'sticky', top: 0, zIndex: 100 }}>
+    <header style={{ padding: '24px 48px 0', background: 'transparent', position: 'sticky', top: 0, zIndex: 50 }}>
       <nav
         style={{
           display: 'flex',
