@@ -5,8 +5,20 @@ import { Loader2, ArrowRight } from 'lucide-react';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teamfivetactics-vnai2026-1.onrender.com';
 
+interface FloatingShape {
+  type: string;
+  size: number;
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+  animation: string;
+  theme: string;
+  opacity: number;
+}
+
 function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
-  const floatingShapes = [
+  const floatingShapes: FloatingShape[] = [
     // Scattered top area particles (Hero-like frame around the title)
     { type: 'triangle', size: 24, top: '-20px', left: '-80px', animation: 'float-irregular-1 15s infinite ease-in-out', theme: 'blue', opacity: 0.85 },
     { type: 'square', size: 16, top: '10px', right: '-80px', animation: 'float-irregular-2 18s infinite ease-in-out', theme: 'red', opacity: 0.75 },

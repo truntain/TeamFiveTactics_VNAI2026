@@ -3,10 +3,22 @@ import { View } from '../types';
 import mascotHomeImg from '../app/mascot_home.png';
 import { User } from 'lucide-react';
 
+interface FloatingShape {
+  type: string;
+  size: number;
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+  animation: string;
+  theme: string;
+  opacity: number;
+}
+
 function HomeView({ onNavigate, isLoggedIn, onOpenAuth }: { onNavigate: (v: View) => void, isLoggedIn: boolean, onOpenAuth: () => void }) {
   const handleStart = () => isLoggedIn ? onNavigate('prechat') : onOpenAuth();
 
-  const floatingShapes = [
+  const floatingShapes: FloatingShape[] = [
     // Left side particles
     { type: 'triangle', size: 24, top: '0px', left: '-120px', animation: 'float-irregular-1 15s infinite ease-in-out', theme: 'blue', opacity: 0.85 },
     { type: 'square', size: 18, top: '20px', left: '-180px', animation: 'float-irregular-2 18s infinite ease-in-out', theme: 'red', opacity: 0.75 },
