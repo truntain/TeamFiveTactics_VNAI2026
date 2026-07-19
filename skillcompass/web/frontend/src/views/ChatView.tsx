@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View } from '../types';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, ArrowLeft } from 'lucide-react';
+import logoImg from '../app/logo.png';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://teamfivetactics-vnai2026-1.onrender.com';
 
@@ -115,14 +116,45 @@ function ChatView({ onNavigate }: { onNavigate: (v: View) => void }) {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', fontFamily: '"Google Sans Flex", sans-serif', background: '#FAFAFA' }}>
+    <div style={{ display: 'flex', height: '100vh', fontFamily: '"Google Sans Flex", sans-serif', background: 'transparent' }}>
 
       {/* SIDEBAR */}
-      <div style={{ width: '300px', background: '#FFFFFF', borderRight: '1px solid rgba(6,4,14,0.06)', padding: '32px 24px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="chat-sidebar" style={{ width: '300px', background: '#FFFFFF', borderRight: '1px solid rgba(6,4,14,0.06)', padding: '32px 24px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Nút thoát phiên trò chuyện */}
+        <div style={{ marginBottom: '24px' }}>
+          <button
+            onClick={() => onNavigate('home')}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#5F6368',
+              fontSize: '14px',
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              padding: '0',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.color = '#D93025';
+              const arrow = e.currentTarget.querySelector('.back-arrow') as HTMLElement;
+              if (arrow) arrow.style.transform = 'translateX(-4px)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.color = '#5F6368';
+              const arrow = e.currentTarget.querySelector('.back-arrow') as HTMLElement;
+              if (arrow) arrow.style.transform = 'none';
+            }}
+          >
+            <ArrowLeft className="back-arrow" size={18} style={{ transition: 'transform 0.2s ease' }} />
+            Thoát phiên trò chuyện
+          </button>
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '20px', background: '#CBB0EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: '16px', height: '16px', borderRadius: '4px', background: '#1F1738' }} />
-          </div>
+          <img src={logoImg.src} alt="Logo" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
           <div>
             <h3 style={{ fontWeight: 500, fontSize: '20px', lineHeight: '24px', color: '#06040E', margin: 0 }}>AI Counselor</h3>
             <p style={{ fontWeight: 700, fontSize: '12px', lineHeight: '16px', color: 'rgba(6,4,14,0.5)', margin: 0, textTransform: 'uppercase', letterSpacing: '1.2px' }}>ACTIVE SESSION</p>
@@ -186,23 +218,24 @@ function ChatView({ onNavigate }: { onNavigate: (v: View) => void }) {
           )}
         </div>
 
-        <div style={{ marginTop: '16px' }}>
-          <button onClick={() => onNavigate('home')} className="gemini-pill" style={{
-            color: '#D93025', fontWeight: 500, border: '1px solid rgba(217,48,37,0.2)', display: 'flex', justifyContent: 'center', margin: 0, width: '100%'
-          }}>Thoát phiên trò chuyện</button>
-        </div>
+
       </div>
 
       {/* CHAT AREA */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '40px' }}>
-        <div className="gemini-card" style={{ flex: 1, borderRadius: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="chat-area-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '40px' }}>
+        <div className="gemini-card chat-card" style={{ flex: 1, borderRadius: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-          <div style={{ padding: '24px 32px', borderBottom: '1px solid rgba(6,4,14,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF' }}>
-            <h2 style={{ fontWeight: 500, fontSize: '32px', lineHeight: '36px', color: '#06040E', margin: 0 }}>Tư vấn Định hướng Hướng nghiệp</h2>
+          <div className="chat-header" style={{ padding: '24px 32px', borderBottom: '1px solid rgba(6,4,14,0.06)', display: 'flex', alignItems: 'center', gap: '12px', background: '#FFFFFF' }}>
+            <button className="mobile-exit-btn" onClick={() => onNavigate('home')} style={{
+              background: 'none', border: 'none', cursor: 'pointer', display: 'none', color: '#5F6368', padding: '4px'
+            }}>
+              <ArrowLeft size={24} />
+            </button>
+            <h2 className="chat-title" style={{ fontWeight: 500, fontSize: '32px', lineHeight: '36px', color: '#06040E', margin: 0 }}>Tư vấn Định hướng Hướng nghiệp</h2>
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', background: '#FAFAFA' }}>
+          <div className="chat-messages" style={{ flex: 1, overflowY: 'auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', background: '#FAFAFA' }}>
             {msgs.map((m, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                 <div style={{
@@ -235,7 +268,7 @@ function ChatView({ onNavigate }: { onNavigate: (v: View) => void }) {
           </div>
 
           {/* Input */}
-          <div style={{ padding: '24px 32px', borderTop: '1px solid rgba(0,0,0,0.04)', background: '#FFFFFF' }}>
+          <div className="chat-input-area" style={{ padding: '24px 32px', borderTop: '1px solid rgba(0,0,0,0.04)', background: '#FFFFFF' }}>
             <form onSubmit={send} style={{ display: 'flex', gap: '16px', background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '40px', padding: '8px 8px 8px 24px', boxShadow: '0 8px 24px rgba(0,0,0,0.04)' }}>
               <input value={input} onChange={e => setInput(e.target.value)} disabled={isLoading} placeholder="Nhập câu trả lời của bạn..." style={{
                 flex: 1, border: 'none', outline: 'none', background: 'transparent',

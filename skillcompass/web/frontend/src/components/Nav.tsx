@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View } from '../types';
+import logoImg from '../app/logo.png';
 
-function Nav({ onNavigate, onOpenAuth, isLoggedIn, onLogout }: { onNavigate: (v: View) => void, onOpenAuth: () => void, isLoggedIn: boolean, onLogout: () => void }) {
+function Nav({ currentView, onNavigate, onOpenAuth, isLoggedIn, onLogout }: { currentView: View, onNavigate: (v: View) => void, onOpenAuth: () => void, isLoggedIn: boolean, onLogout: () => void }) {
   const [profileOpen, setProfileOpen] = useState(false);
   return (
-    <header style={{ padding: '24px 48px 0', background: '#FAFAFA', position: 'sticky', top: 0, zIndex: 100 }}>
+    <header style={{ padding: '24px 48px 0', background: 'transparent', position: 'sticky', top: 0, zIndex: 100 }}>
       <nav
         style={{
           display: 'flex',
@@ -25,14 +26,15 @@ function Nav({ onNavigate, onOpenAuth, isLoggedIn, onLogout }: { onNavigate: (v:
             background: 'none', border: 'none', cursor: 'pointer',
           }}
         >
-          <span style={{ fontFamily: '"Google Sans Flex", sans-serif', fontWeight: 500, fontSize: '24px', lineHeight: '28px', color: '#06040E', letterSpacing: '-0.3px' }}>
+          <img src={logoImg.src} alt="Logo" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
+          <span className="nav-logo-text" style={{ fontFamily: '"Google Sans Flex", sans-serif', fontWeight: 500, fontSize: '24px', lineHeight: '28px', color: '#06040E', letterSpacing: '-0.3px' }}>
             Career Pilot
           </span>
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {[{ name: 'Trang chủ', id: 'home' }, { name: 'Xu hướng', id: 'market' }, { name: 'Hồ sơ cá nhân', id: 'profile' }].map(l => (
-            <button key={l.name} className="nav-link" onClick={() => onNavigate(l.id as View)}>
+            <button key={l.name} className={`nav-link ${currentView === l.id ? 'active' : ''}`} onClick={() => onNavigate(l.id as View)}>
               {l.name}
             </button>
           ))}
@@ -42,6 +44,7 @@ function Nav({ onNavigate, onOpenAuth, isLoggedIn, onLogout }: { onNavigate: (v:
           {isLoggedIn ? (
             <div style={{ position: 'relative' }}>
               <button
+                className="nav-profile-btn"
                 onClick={() => setProfileOpen(!profileOpen)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
@@ -86,7 +89,7 @@ function Nav({ onNavigate, onOpenAuth, isLoggedIn, onLogout }: { onNavigate: (v:
             </div>
           ) : (
             <button
-              className="gemini-gradient-btn"
+              className="gemini-gradient-btn nav-profile-btn"
               onClick={onOpenAuth}
               style={{
                 padding: '14px 28px', borderRadius: '28px',

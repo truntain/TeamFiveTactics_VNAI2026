@@ -75,8 +75,8 @@ function ResultsView({ onNavigate }: { onNavigate: (v: View) => void }) {
   const paths = roadmapData?.paths?.length > 0 ? roadmapData.paths : defaultRecommendedJobs;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FAFAFA', padding: '64px 48px', fontFamily: '"Google Sans Flex", sans-serif' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+    <div className="view-container" style={{ minHeight: '100vh', background: 'transparent', padding: '64px 48px', fontFamily: '"Google Sans Flex", sans-serif' }}>
+      <div className="view-max-width" style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <h2 style={{ fontWeight: 500, fontSize: '32px', lineHeight: '36px', color: '#06040E', marginBottom: '24px' }}>
           Lộ trình Sự nghiệp Đề xuất của Bạn
         </h2>
@@ -96,7 +96,7 @@ function ResultsView({ onNavigate }: { onNavigate: (v: View) => void }) {
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '32px', alignItems: 'start' }}>
+            <div className="results-grid" style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '32px', alignItems: 'start' }}>
               {/* Competency Summary */}
               <div className="gemini-card" style={{ borderRadius: '20px', padding: '32px' }}>
                 <h3 className="gemini-gradient-text" style={{ fontWeight: 500, fontSize: '20px', lineHeight: '24px', marginBottom: '24px' }}>Năng lực Cốt lõi</h3>
@@ -184,7 +184,7 @@ function ResultsView({ onNavigate }: { onNavigate: (v: View) => void }) {
                         borderRadius: '20px', padding: '32px',
                         display: 'flex', flexDirection: 'column', transition: 'all 0.3s'
                       }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div className="result-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <div style={{ flex: 1, paddingRight: '16px' }}>
                             <h4 style={{ fontWeight: 500, fontSize: '24px', lineHeight: '28px', color: '#06040E', marginBottom: '8px' }}>{title}</h4>
                             {whyFits && <p style={{ fontSize: '15px', color: '#5F6368', marginBottom: '16px', lineHeight: '22px' }}>{whyFits}</p>}
@@ -194,7 +194,7 @@ function ResultsView({ onNavigate }: { onNavigate: (v: View) => void }) {
                               {expandedIndices.includes(i) ? 'Thu gọn' : 'Xem lộ trình kỹ năng chi tiết'}
                             </button>
                           </div>
-                          <div style={{ textAlign: 'right', minWidth: '100px' }}>
+                          <div className="result-header-right" style={{ textAlign: 'right', minWidth: '100px' }}>
                             <div className="gemini-gradient-text" style={{ fontWeight: 500, fontSize: '36px', lineHeight: '40px' }}>{score}%</div>
                             <p style={{ fontWeight: 700, fontSize: '12px', color: 'rgba(0,0,0,0.5)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>Độ phù hợp</p>
                           </div>

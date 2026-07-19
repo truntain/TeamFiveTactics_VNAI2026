@@ -81,8 +81,28 @@ export default function SkillCompassApp() {
     setView('home');
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+    
+    // Tính toán góc màu Hue chạy từ 190 (Xanh dương sáng) sang 280 (Tím hồng) dựa trên vị trí chuột X
+    const hue = 190 + Math.round((x / rect.width) * 90);
+    e.currentTarget.style.setProperty('--spotlight-color', `hsla(${hue}, 100%, 65%, 0.1)`);
+    e.currentTarget.style.setProperty('--spotlight-color-outer', `hsla(${hue + 45}, 100%, 70%, 0.04)`);
+  };
+
   return (
-    <div style={{ fontFamily: '"Google Sans Flex", sans-serif', background: '#FAFAFA', minHeight: '100vh' }}>
+    <div
+      onMouseMove={handleMouseMove}
+      style={{
+        fontFamily: '"Google Sans Flex", sans-serif',
+        background: 'radial-gradient(circle 350px at var(--mouse-x, -999px) var(--mouse-y, -999px), var(--spotlight-color, rgba(2, 96, 255, 0.08)) 0%, var(--spotlight-color-outer, rgba(139, 92, 246, 0.04)) 50%, transparent 80%), radial-gradient(circle at 15% 20%, rgba(2, 96, 255, 0.05) 0%, transparent 40%), radial-gradient(circle at 85% 15%, rgba(139, 92, 246, 0.04) 0%, transparent 40%), radial-gradient(circle at 75% 75%, rgba(64, 162, 255, 0.05) 0%, transparent 45%), #FAFAFA',
+        minHeight: '100vh'
+      }}
+    >
       <style>{`
         .nav-link {
           position: relative;
@@ -105,7 +125,7 @@ export default function SkillCompassApp() {
           position: absolute;
           width: 0;
           height: 2px;
-          bottom: 4px;
+          bottom: -4px;
           left: 50%;
           background: linear-gradient(53deg, #0260FF 9.29%, #40A2FF 48.23%, #A8BEFF 82.56%);
           transition: all 0.2s ease-in-out;
@@ -114,6 +134,15 @@ export default function SkillCompassApp() {
         }
         .nav-link:hover::after {
           width: calc(100% - 32px);
+          height: 2px;
+          border-radius: 2px;
+          bottom: -4px;
+        }
+        .nav-link.active::after {
+          width: 16px;
+          height: 2px;
+          border-radius: 2px;
+          bottom: -4px;
         }
 
         .gemini-gradient-text {
@@ -161,7 +190,7 @@ export default function SkillCompassApp() {
         .btn-secondary:hover { background: #F5F5F5 !important; border-color: rgba(6,4,14,0.2) !important; }
       `}</style>
 
-      {showNav && <Nav onNavigate={navigate} onOpenAuth={() => setIsAuthOpen(true)} isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
+      {showNav && <Nav currentView={view} onNavigate={navigate} onOpenAuth={() => setIsAuthOpen(true)} isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
 
       {isAuthOpen && (
         <div style={{

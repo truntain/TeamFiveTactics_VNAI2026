@@ -54,18 +54,18 @@ function PreChatView({ onNavigate }: { onNavigate: (v: View) => void }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FAFAFA', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 24px', fontFamily: '"Google Sans Flex", sans-serif' }}>
-      <div className="gemini-card" style={{
+    <div className="view-container" style={{ minHeight: '100vh', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 24px', fontFamily: '"Google Sans Flex", sans-serif' }}>
+      <div className="gemini-card responsive-card" style={{
         borderRadius: '20px', padding: '48px', maxWidth: '640px', width: '100%',
       }}>
         <h2 style={{ fontWeight: 500, fontSize: '32px', lineHeight: '36px', color: '#06040E', marginBottom: '16px', textAlign: 'center' }}>
           Khảo sát đầu vào
         </h2>
-        <p style={{ fontWeight: 400, fontSize: '24px', lineHeight: '28px', color: '#5F6368', marginBottom: '40px', textAlign: 'center' }}>
+        <p style={{ fontWeight: 400, fontSize: '16px', lineHeight: '20px', color: '#5F6368', marginBottom: '40px', textAlign: 'center' }}>
           Hãy cung cấp một vài thông tin trước khi bắt đầu phiên.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
+        <div className="grid-2-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
           <div style={{ gridColumn: '1 / -1' }}>
             <label style={{ display: 'block', fontWeight: 500, fontSize: '16px', lineHeight: '20px', color: '#06040E', marginBottom: '8px' }}>Họ và Tên</label>
             <input type="text" placeholder="Nguyễn Văn A" value={name} onChange={e => setName(e.target.value)} style={{
