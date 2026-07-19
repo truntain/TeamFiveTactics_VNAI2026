@@ -375,6 +375,190 @@ function HomeView({ onNavigate, isLoggedIn, onOpenAuth }: { onNavigate: (v: View
           </div>
         </section>
 
+        {/* NEWS SECTION */}
+        <section style={{ marginTop: '32px', position: 'relative' }}>
+          {/* Section corner shapes: Left */}
+          <div style={{ position: 'absolute', top: '20px', left: '-35px', animation: 'float-irregular-2 16s infinite ease-in-out', pointerEvents: 'none', zIndex: 1 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24">
+              <path d="M12 3L3 20h18L12 3z" fill="url(#shape-blue-gradient)" stroke="url(#shape-blue-gradient)" strokeWidth="4" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div style={{ position: 'absolute', top: '80px', left: '-55px', animation: 'float-irregular-3 19s infinite ease-in-out', pointerEvents: 'none', zIndex: 1 }}>
+            <svg width="10" height="10" viewBox="0 0 10 10">
+              <rect width="10" height="10" rx="2" fill="url(#shape-yellow-gradient)" />
+            </svg>
+          </div>
+
+          <div style={{ marginBottom: '32px' }}>
+            <span style={{
+              display: 'block',
+              fontFamily: '"Google Sans Flex", sans-serif',
+              fontWeight: 700,
+              fontSize: '14px',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+              color: '#0260FF',
+              marginBottom: '8px'
+            }}>Tin tức & Xu hướng</span>
+            <h2 style={{
+              fontFamily: '"Google Sans Flex", sans-serif',
+              fontWeight: 500,
+              fontSize: '32px',
+              lineHeight: '36px',
+              color: '#06040E',
+              margin: 0
+            }}>Góc nhìn nghề nghiệp 2026</h2>
+          </div>
+
+          <div className="grid-3-col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+
+            {/* Article 1 */}
+            <article style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '28px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              boxShadow: '0 2px 12px rgba(6,4,14,0.06)',
+              border: '1px solid rgba(6,4,14,0.06)',
+              transition: 'box-shadow 0.2s ease',
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(2,96,255,0.08) 0%, rgba(64,162,255,0.08) 100%)',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                width: 'fit-content'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0260FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span style={{ fontFamily: '"Google Sans Flex", sans-serif', fontSize: '12px', fontWeight: 500, color: '#0260FF' }}>04/03/2026</span>
+              </div>
+              <h3 style={{
+                fontFamily: '"Google Sans Flex", sans-serif',
+                fontWeight: 500,
+                fontSize: '17px',
+                lineHeight: '24px',
+                color: '#06040E',
+                margin: 0
+              }}>Định hướng nghề nghiệp 2026: Chọn đúng ngành học để làm chủ tương lai</h3>
+              <p style={{
+                fontFamily: '"Google Sans Flex", sans-serif',
+                fontWeight: 400,
+                fontSize: '14px',
+                lineHeight: '22px',
+                color: '#5F6368',
+                margin: 0,
+                display: '-webkit-box',
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden'
+              }}>Bối cảnh 2026: khi AI định nghĩa lại bản đồ kỹ năng. Năm 2026, chúng ta đang đứng giữa tâm điểm của sự dịch chuyển nghề nghiệp mạnh mẽ dưới tác động của số hóa và trí tuệ nhân tạo.</p>
+            </article>
+
+            {/* Article 2 */}
+            <article style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '28px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              boxShadow: '0 2px 12px rgba(6,4,14,0.06)',
+              border: '1px solid rgba(6,4,14,0.06)',
+              transition: 'box-shadow 0.2s ease',
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(2,96,255,0.08) 0%, rgba(64,162,255,0.08) 100%)',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                width: 'fit-content'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0260FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span style={{ fontFamily: '"Google Sans Flex", sans-serif', fontSize: '12px', fontWeight: 500, color: '#0260FF' }}>28/01/2026</span>
+              </div>
+              <h3 style={{
+                fontFamily: '"Google Sans Flex", sans-serif',
+                fontWeight: 500,
+                fontSize: '17px',
+                lineHeight: '24px',
+                color: '#06040E',
+                margin: 0
+              }}>Xu hướng việc làm 2026: Dịch chuyển từ "ổn định công việc" sang "ổn định năng lực"</h3>
+              <p style={{
+                fontFamily: '"Google Sans Flex", sans-serif',
+                fontWeight: 400,
+                fontSize: '14px',
+                lineHeight: '22px',
+                color: '#5F6368',
+                margin: 0,
+                display: '-webkit-box',
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden'
+              }}>Thị trường lao động Việt Nam đang bước vào giai đoạn chuyển động mạnh mẽ khi nền kinh tế phục hồi và quá trình chuyển đổi số diễn ra sâu rộng trong hầu hết lĩnh vực. Các vị trí công việc tiếp tục tăng trưởng nhưng đi kèm sàng lọc mạnh mẽ về kỹ năng.</p>
+            </article>
+
+            {/* Article 3 */}
+            <article style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '28px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              boxShadow: '0 2px 12px rgba(6,4,14,0.06)',
+              border: '1px solid rgba(6,4,14,0.06)',
+              transition: 'box-shadow 0.2s ease',
+            }}>
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(2,96,255,0.08) 0%, rgba(64,162,255,0.08) 100%)',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                width: 'fit-content'
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0260FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span style={{ fontFamily: '"Google Sans Flex", sans-serif', fontSize: '12px', fontWeight: 500, color: '#0260FF' }}>15/02/2026</span>
+              </div>
+              <h3 style={{
+                fontFamily: '"Google Sans Flex", sans-serif',
+                fontWeight: 500,
+                fontSize: '17px',
+                lineHeight: '24px',
+                color: '#06040E',
+                margin: 0
+              }}>Kỹ năng số và tư duy phân tích: Bộ đôi không thể thiếu trong thị trường lao động hiện đại</h3>
+              <p style={{
+                fontFamily: '"Google Sans Flex", sans-serif',
+                fontWeight: 400,
+                fontSize: '14px',
+                lineHeight: '22px',
+                color: '#5F6368',
+                margin: 0,
+                display: '-webkit-box',
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden'
+              }}>Theo khảo sát từ các doanh nghiệp hàng đầu Việt Nam, hơn 70% nhà tuyển dụng ưu tiên ứng viên có khả năng ứng dụng công nghệ và phân tích dữ liệu. Sở hữu hai kỹ năng nền tảng này chính là lợi thế cạnh tranh bền vững trong bối cảnh tự động hóa ngày càng lan rộng.</p>
+            </article>
+
+          </div>
+        </section>
+
         {/* Philosophy Quote Section */}
         <section className="philosophy-section" style={{
           marginTop: '32px',
