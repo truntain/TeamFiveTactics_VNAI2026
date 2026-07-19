@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { View } from '../types';
 import CustomSelect from '../components/CustomSelect';
 import { Loader2, ArrowRight } from 'lucide-react';
@@ -407,7 +408,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
         </section>
 
         {/* Job Detail Modal Popup */}
-        {selectedJob && (
+        {selectedJob && typeof document !== 'undefined' && createPortal(
           <div className="modal-wrapper" style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
@@ -562,9 +563,9 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
 
             </div>
           </div>
-        )}
+        , document.body)}
         {/* Industry Jobs List Modal Popup */}
-        {selectedIndustry && (
+        {selectedIndustry && typeof document !== 'undefined' && createPortal(
           <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
@@ -635,7 +636,7 @@ function MarketView({ onNavigate }: { onNavigate: (v: View) => void }) {
 
             </div>
           </div>
-        )}
+        , document.body)}
 
       </div>
     </div>
